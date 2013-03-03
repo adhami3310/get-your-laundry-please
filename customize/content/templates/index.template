@@ -1,0 +1,14 @@
+<html>
+<head>
+	<title>{title}</title>
+    <link rel="stylesheet" href="css/main.css" type="text/css"/>
+</head>
+<body>
+
+<img src="images/photo.jpg" style="width:100%">
+
+This data will be parsed nicely by client-side javascript:
+{washers}
+
+</body>
+</html>
