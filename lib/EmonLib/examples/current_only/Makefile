@@ -155,8 +155,9 @@ endif
 
 #
 # Set up values according to what the IDE uses:
-#
-DOWNLOAD_RATE = $(shell grep "^$(MODEL)\." $(ARDUINO_DIR)/hardware/arduino/boards.txt $(ATTINY_BOARDS) | grep upload.speed | sed 's/.*=//')
+# avrdude -V -F -p atmega328p -P /dev/ttyUSB1 -c stk500v1 -b 57600 -C/etc/avrdude.conf -U flash:w:applet/current_only.hex
+DOWNLOAD_RATE = 57600
+#$(shell grep "^$(MODEL)\." $(ARDUINO_DIR)/hardware/arduino/boards.txt $(ATTINY_BOARDS) | grep upload.speed | sed 's/.*=//')
 MCU = $(shell grep "^$(MODEL)\." $(ARDUINO_DIR)/hardware/arduino/boards.txt $(ATTINY_BOARDS) | grep build.mcu | sed 's/.*=//')
 F_CPU = $(shell grep "^$(MODEL)\." $(ARDUINO_DIR)/hardware/arduino/boards.txt $(ATTINY_BOARDS) | grep build.f_cpu | sed 's/.*=//')
 
@@ -164,7 +165,8 @@ F_CPU = $(shell grep "^$(MODEL)\." $(ARDUINO_DIR)/hardware/arduino/boards.txt $(
 # One rumor says that the difference is that arduino does an auto-reset,
 # stk500 doesn't.
 # Might want to grep for upload.protocol as with previous 3 values.
-AVRDUDE_PROGRAMMER = arduino
+AVRDUDE_PROGRAMMER = stk500v1
+#arduino
 
 # This has only been tested on standard variants. I'm guessing
 # at what mega and micro might need; other possibilities are
