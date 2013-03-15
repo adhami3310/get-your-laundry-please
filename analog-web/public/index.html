@@ -27,24 +27,26 @@
   </style>
 </head>
 <body>
-  <p id="data">Data would go here?</p>
+  <p id="stati">Stati: </p>
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 <script src="chart.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() {
-    function update() {
-      $.ajax(
-        {url: "/rawdata"}
-      ).done(function(data) {
-        $("#data").text(""+data);
-        console.log(data);
-        tick(parseFloat(data));
-      });
-      setTimeout(update, 500);
-    }
-    update();
-  });
+<script src="init.js"></script>
+<script>
+/* $(document).ready(function() {
+  function update() {
+    $.ajax(
+      {url: "/rawdata"}
+    ).done(function(data) {
+      $("#data").text(""+data);
+      console.log(data);
+      tick(parseFloat(data));
+    });
+    setTimeout(update, 500);
+  }
+  update();
+}); */
 </script>
 </body>
 </html>
