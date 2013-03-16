@@ -1,5 +1,5 @@
 *.py[cod]
-
+analog-web/node_modules/
 # C extensions
 *.so
 
