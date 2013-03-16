@@ -3,7 +3,6 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
 var _ = require('underscore');
-_.each(["hey", "hey"], console.log);
 
 io.configure(function(){
   io.set('log level', 1);
@@ -55,7 +54,8 @@ io.sockets.on("connection", function(socket) {
       socket.emit("subscribe", false);
     }
   });
-  //socket.emit("status", machines.getStatus());
+  socket.emit("washers", washers.getStatus());
+  socket.emit("dryers", dryers.getStatus());
 });
 
 washers.on("status", function(data) {

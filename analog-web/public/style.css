@@ -1,0 +1,32 @@
+body {
+  padding: 40px;
+}
+.x.axis line {
+  shape-rendering: auto;
+}
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+svg {
+  font: 10px sans-serif;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.status {
+  width: 5em;
+  height: 5em;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid black;
+  float: left;
+}
+
+
