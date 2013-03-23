@@ -43,7 +43,7 @@ Machines.prototype.onData = function(data) {
 
   this.lastReceived = splot[0];
   this.buf = splot[1]; //save overfill
-  
+
   if(!this.lastReceived) return; //if nothing has been received, return
 
   var vals = _.map(this.lastReceived.split(" "), parseFloat); //get currents
@@ -91,10 +91,11 @@ Machines.prototype.onData = function(data) {
 };
 
 Machines.prototype.getStatus = function() {
+  console.log("getting status!");
   return {
     onStatus: this.onStatus,
     unique: Math.random(),
-    transitions: this.transisitions
+    transitions: this.transitions
   };
 };
 

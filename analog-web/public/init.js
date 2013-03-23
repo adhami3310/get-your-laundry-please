@@ -12,13 +12,13 @@ var dryers = [
 ];
 
 socket.on("washers", function(data) {
-  console.log("status: ");
+  console.log("washer status: ");
   console.log(data);
   updateStati("washer", data);
 });
 
 socket.on("dryers", function(data) {
-  console.log("status: ");
+  console.log("dryer status: ");
   console.log(data);
   updateStati("dryer", data);
 });
@@ -26,6 +26,7 @@ socket.on("dryers", function(data) {
 function updateStati(prefix, data) {
   for(var i = 0; i < data.onStatus.length; i++) {
     var el = $("#"+prefix+i);
+    var clr = data.onStatus[i] ? "green" : "red";
     el.css("background-color", clr);
     var diff = Math.floor((Date.now() - data.transitions[i])/60000);
     el.text(diff);

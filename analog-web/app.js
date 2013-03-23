@@ -61,7 +61,7 @@ io.sockets.on("connection", function(socket) {
 washers.on("status", function(data) {
   io.sockets.emit("washers", data);
   //io.sockets.in("status").emit("washers", data);
-  if(data.data[0]) return; //machine is on
+  if(data.onStatus[0]) return; //machine is on
   //send emails and stuff
   var queue = subscribers["washer"];
 

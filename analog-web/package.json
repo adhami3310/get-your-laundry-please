@@ -1,0 +1,13 @@
+{
+  "name": "laundry",
+  "description": "random hall's laundry server",
+  "version": "0.0.17",
+  "private": true,
+  "dependencies": {
+    "express": "3.1.x",
+    "nodemailer": "0.3.x",
+    "serialport": "1.0.5",
+    "socket.io": "0.9.x",
+    "underscore": "1.4.x"
+  }
+}
