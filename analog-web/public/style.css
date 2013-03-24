@@ -23,9 +23,13 @@ svg {
 .status {
   width: 5em;
   height: 5em;
+  display: inline-block;
+  border-radius: 100%;
   text-align: center;
   vertical-align: middle;
-  border: 1px solid black;
+  border: 0.5em solid;
+  border-color: black;
+  padding: 1em;
   float: left;
 }
 

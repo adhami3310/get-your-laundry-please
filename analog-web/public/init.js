@@ -23,13 +23,34 @@ socket.on("dryers", function(data) {
   updateStati("dryer", data);
 });
 
+var lastTransitions = {
+  washer: [],
+  dryer: []
+};
+
+
+
+
+function heartbeat() {
+  function updateFunction(type) {
+    return function(date,id) {
+      var el = $("#"+type+id);
+      var diff = Math.floor((Date.now() - date)/60000);
+      el.text(diff);
+    }
+  };
+  _.each(lastTransitions.washer, updateFunction("washer"));
+  _.each(lastTransitions.dryer,  updateFunction("dryer"));
+}
+setInterval(heartbeat, 500);
+
 function updateStati(prefix, data) {
+  lastTransitions[prefix] = data.transitions;
   for(var i = 0; i < data.onStatus.length; i++) {
     var el = $("#"+prefix+i);
     var clr = data.onStatus[i] ? "green" : "red";
-    el.css("background-color", clr);
-    var diff = Math.floor((Date.now() - data.transitions[i])/60000);
-    el.text(diff);
+    el.css("border-color", clr);
+    //updateFunction(prefix)(data.transitions[i], i);
   }
 }
 socket.on("washers_raw", function(data) {
