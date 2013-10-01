@@ -14,12 +14,12 @@ function Machines(count) {
   for(var i = 0; i < count; i++) {
     this.onStatus.push(false);
     this.transitionings.push(false);
-    this.transitions.push(new Date());
-    this.lastEvents.push(new Date());
+    this.transitions.push(Date.now());
+    this.lastEvents.push(Date.now());
   }
   this.transDelayDown = 77000;
   this.transDelayUp = 1700;
-  this.currentCutoff = 0.45;
+  this.currentCutoff = 0.75;
 }
 
 util.inherits(Machines, events.EventEmitter);
@@ -47,16 +47,17 @@ Machines.prototype.onData = function(data) {
   if(!this.lastReceived) return; //if nothing has been received, return
 
   var vals = _.map(this.lastReceived.split(" "), parseFloat); //get currents
+  //console.log(vals);
   this.emit("rawdata", vals); //emit current values to the application
 
   //for every machine being tracked
-  for(var i = 0; i < this.onStatus.length && i < vals.length; i++) {
-    //if it is on
+  for(var i = 0; i < vals.length && i < this.onStatus.length; i++) {
+    //if it is on;
     if( this.onStatus[i] ) {
       //if current is high it's expected (the machine is on)
       if(vals[i] > this.currentCutoff) {
         this.transitionings[i] = false;
-        return; //expected, ignore
+        continue; //expected, ignore
       }
       //current must be low
       if(!this.transitionings[i]) {
@@ -65,6 +66,7 @@ Machines.prototype.onData = function(data) {
       }
       //transition into off, current has been low for transDelayDown
       if(Date.now() - this.lastEvents[i] > this.transDelayDown) {
+        //console.log(i+" is now down because "+vals[i]);
         this.onStatus[i] = false;
         this.transitions[i] = Date.now();
         this.emit("status", this.getStatus());
@@ -74,7 +76,7 @@ Machines.prototype.onData = function(data) {
       //current is low, it's expected
       if(vals[i] < this.currentCutoff) {
         this.transitionings[i] = false;
-        return; //expected, ignore
+        continue; //expected, ignore
       }
       if(!this.transitionings[i]) {
         this.transitionings[i] = true;
@@ -82,6 +84,7 @@ Machines.prototype.onData = function(data) {
       }
       //transition to on
       if(Date.now() - this.lastEvents[i] > this.transDelayUp) {
+        //console.log(i+" is now up because "+vals[i]);
         this.onStatus[i] = true;
         this.transitions[i] = Date.now();
         this.emit("status", this.getStatus());
