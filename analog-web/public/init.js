@@ -145,7 +145,7 @@ $(".status, .status *, .notify").on("click", function(evt) {
 
   var match;
   if (match = id.match(/(washer|dryer)Any/)) {
-    if (_.every(lastOnStati[match[1]], _.negate(_.partial(_.equals, 1)))) {
+    if (_.every(lastOnStati[match[1]], _.negate(_.partial(_.isEqual, 1)))) {
       $("#confirm").css("black");
       $("#confirm").text("No "+match[1]+"s are currently running.");
       return;
