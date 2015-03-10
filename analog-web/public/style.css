@@ -20,7 +20,7 @@ svg {
   shape-rendering: crispEdges;
 }
 
-.status {
+.notify {
   width: 90px;
   height: 90px;
   display: inline-block;
