@@ -198,16 +198,3 @@ $(".status, .status *, .notify").on("click", function(evt) {
     });
   }
 });
-
-$("#test").on("click", function() {
-  parsed = parseContact($("#contactInfo").val());
-  if (parsed.contact !== "") {
-    socket.emit("subscribe", {
-      contact: parsed.contact,
-      target: "test"
-    });
-  } else {
-    $("#confirm").css("color", "red");
-    $("#confirm").text("Please enter contact information.");
-  }
-});
