@@ -105,13 +105,13 @@ function parseContact(cont) {
   return { contact: cont, medium: medium };
 }
 
-$("#notify").on("change keydown keyup", function(evt) {
+$("#contactInfo").on("change keydown keyup", function(evt) {
   if (evt.which === 13) {
     evt.preventDefault();
   }
-  document.cookie = "contact=" + escape($("#notify").val());
+  document.cookie = "contact=" + escape($("#contactInfo").val());
   $("#confirm").text("");
-  parsed = parseContact($("#notify").val());
+  parsed = parseContact($("#contactInfo").val());
   if (parsed.contact !== "")
     $("#contact").text(parsed.medium+": "+parsed.contact);
   else
@@ -120,8 +120,8 @@ $("#notify").on("change keydown keyup", function(evt) {
 
 contact = document.cookie.match ( '(^|;) *contact=([^;]*)(;|$)' );
 if (contact) {
-  $("#notify").val(unescape(contact[2]));
-  $("#notify").trigger("change");
+  $("#contactInfo").val(unescape(contact[2]));
+  $("#contactInfo").trigger("change");
 }
 
 
@@ -129,18 +129,29 @@ var humanReadables = {
   "washer0": "washer #0",
   "washer1": "washer #1",
   "washer2": "washer #2",
+  "washerAny": "any washer",
   "dryer0":  "dryer #0",
   "dryer1":  "dryer #1",
   "dryer2":  "dryer #2",
   "dryer3":  "dryer #3",
-  null: "_______"
+  "dryerAny": "any dryer",
 };
 
 
-$(".status, .status *").on("click", function(evt) {
+$(".notify, .notify *").on("click", function(evt) {
   $("#confirm").text("");
 
-  var id = $(evt.target).closest(".status")[0].id;
+  var id = $(evt.target).closest(".notify")[0].id;
+
+  var match;
+  if (match = id.match(/(washer|dryer)Any/)) {
+    if (_.every(lastOnStati[match[1]], _.negate(_.partial(_.equals, 1)))) {
+      $("#confirm").css("black");
+      $("#confirm").text("No "+match[1]+"s are currently running.");
+      return;
+    }
+  }
+  
   if(id.substr(0,6) === "washer") {
     var idx = parseInt(id.substr(6));
     if(lastOnStati["washer"][idx] !== 1)
@@ -157,7 +168,7 @@ $(".status, .status *").on("click", function(evt) {
     return;
   }
 
-  var parsed = parseContact($("#notify").val());
+  var parsed = parseContact($("#contactInfo").val());
 
   if (parsed.contact === '') {
     $("#confirm").css("color", "red");
@@ -169,28 +180,32 @@ $(".status, .status *").on("click", function(evt) {
     contact: parsed.contact,
     target: id,
   });
-  socket.on("subscribe", function (success) {
-    if (success) {
-      $("#confirm").css("color", "green");
-      $("#confirm").text(parsed.medium+" will be sent to "+parsed.contact+" when "
-			 +humanReadables[id]+" finishes.");
-    } else {
-      $("#confirm").css("color", "red");
-      $("#confirm").text("Notification queue for "+humanReadables[id]
-			 +" is full.");
-    }
-  });
+
+  if (id === "test") {
+    $("#confirm").css("color", "black");
+    $("#confirm").text("Sending test "+parsed.medium.toLowerCase()+" to "+parsed.contact);
+  } else {
+    socket.on("subscribe", function (success) {
+      if (success) {
+        $("#confirm").css("color", "green");
+        $("#confirm").text(parsed.medium+" will be sent to "+parsed.contact+" when "
+			   +humanReadables[id]+" finishes.");
+      } else {
+        $("#confirm").css("color", "red");
+        $("#confirm").text("Notification queue for "+humanReadables[id]
+			   +" is full.");
+      }
+    });
+  }
 });
 
 $("#test").on("click", function() {
-  parsed = parseContact($("#notify").val());
+  parsed = parseContact($("#contactInfo").val());
   if (parsed.contact !== "") {
     socket.emit("subscribe", {
       contact: parsed.contact,
       target: "test"
     });
-    $("#confirm").css("color", "black");
-    $("#confirm").text("Sending test "+parsed.medium.toLowerCase()+" to "+parsed.contact);
   } else {
     $("#confirm").css("color", "red");
     $("#confirm").text("Please enter contact information.");

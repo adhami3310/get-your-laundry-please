@@ -47,6 +47,9 @@ for (var i = 0; i < 3; ++i)
 for (var i = 0; i < 4; ++i)
   subscribers["dryer"+i] = [];
 
+subscribers["washerAny"] = [];
+subscribers["dryerAny"] = [];
+
 io.sockets.on("connection", function(socket) {
   socket.on("subscribe", function(data) {
     console.log("subscribe: ");
@@ -156,19 +159,21 @@ function makeCheckFunction(type) {
     //todo wildcards
     for(var i = 0; i < onStati.length; i++) {
       var name = type+i;
+      var any = type+"Any";
       if(onStati[i] > 0) {
         console.log(name+"machine is "+(onStati[i] === 1 ? "on" : "out of order"));
         continue;
       }
       if(!subscribers.hasOwnProperty(name)) continue;
-      var queue = subscribers[name];
+      var queue = subscribers[name].concat(subscribers[any]);
       if (queue.length > 0)
-	console.log("sending notifications to "+queue);
+	      console.log("sending notifications to "+queue);
       //send emails and stuff
       for(var j = 0; j < queue.length; j++) {
-	notify(queue[j], type+" #"+i+" is done");
+	      notify(queue[j], type+" #"+i+" is done");
       }
-      subscribers[name]=[] //their laundry is done --> no longer interested
+      subscribers[name] = []; //their laundry is done --> no longer interested
+      subscribers[any] = [];
     }
   };
 }
