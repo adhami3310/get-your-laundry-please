@@ -138,10 +138,10 @@ var humanReadables = {
 };
 
 
-$(".notify, .notify *").on("click", function(evt) {
-  $("#confirm").text("");
+$(".status, .status *, .notify").on("click", function(evt) {
+    $("#confirm").text("");
 
-  var id = $(evt.target).closest(".notify")[0].id;
+  var id = $(evt.target).closest(".status, .notify")[0].id;
 
   var match;
   if (match = id.match(/(washer|dryer)Any/)) {
