@@ -39,16 +39,25 @@ function heartbeat() {
 
 setInterval(heartbeat, 500);
 
+var statusColor = ["green", "red", "black"]
+var statusText = ["Off for", "On for", "Out of order"]
+
 function updateStati(prefix, data) {
   lastTransitions[prefix] = data.transitions;
   lastOnStati[prefix] = data.onStatus;
   for(var i = 0; i < data.onStatus.length; i++) {
     var el = $("#"+prefix+i);
-    var clr = data.onStatus[i] ? "green" : "red";
+    var clr = statusColor[data.onStatus[i]];
     var onoff = el.children(".cell").children(".onoff");
-    var txt = data.onStatus[i] ? "On for" : "Off for";
+    var time = el.children(".cell").children(".time");
+    var label = el.children(".cell").children(".label");
+    var txt = statusText[data.onStatus[i]];
     el.css("border-color", clr);
     onoff.text(txt);
+    if (data.onStatus[i] === 2) {
+      time.css("display", "none");
+      label.css("display", "none");
+    }
     //updateFunction(prefix)(data.transitions[i], i);
   }
 }
@@ -77,24 +86,44 @@ function enableCharts() {
 
 }
 
-$("#email").keydown(function(evt) {
-  if(evt.which === 13) {
-    evt.preventDefault();
-    var email = $("#email").val();
-    socket.emit("subscribe", {
-      email: email.trim(),
-      target: subscribeTarget
-    });
-    $("#email").val("");
+function parseContact(cont) {
+  cont = cont.trim();
+  if (cont === "" || cont == null)
+    return { contact: "", medium: "" };
+
+  var medium;
+  var cell;
+  if (cell = cont.match(/^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/)) {
+    medium = "Text";
+    cont = cell[1] + cell[2] + cell[3];
   }
+  else if (cont.match(/^[^ ]+@[^ ]+$/))
+    medium = "Email";
+  else
+    medium = "Zephyr";
+
+  return { contact: cont, medium: medium };
+}
+
+$("#notify").on("change keydown keyup", function(evt) {
+  if (evt.which === 13) {
+    evt.preventDefault();
+  }
+  document.cookie = "contact=" + escape($("#notify").val());
+  $("#confirm").text("");
+  parsed = parseContact($("#notify").val());
+  if (parsed.contact !== "")
+    $("#contact").text(parsed.medium+": "+parsed.contact);
+  else
+    $("#contact").text("Invalid contact");
 });
 
-var subscribeTarget;
-
-function unsetSubscribeTarget() {
-  setSubscribeTarget(null);
-  subscribeTarget = null;
+contact = document.cookie.match ( '(^|;) *contact=([^;]*)(;|$)' );
+if (contact) {
+  $("#notify").val(unescape(contact[2]));
+  $("#notify").trigger("change");
 }
+
 
 var humanReadables = {
   "washer0": "washer #0",
@@ -108,30 +137,62 @@ var humanReadables = {
 };
 
 
-function setSubscribeTarget(id) {
-  $("#machine-name").text(humanReadables[id]);
-  subscribeTarget = id;
-}
+$(".status, .status *").on("click", function(evt) {
+  $("#confirm").text("");
 
-$(".status").mouseenter(function(evt) {
-  var id = evt.target.id;
+  var id = $(evt.target).closest(".status")[0].id;
   if(id.substr(0,6) === "washer") {
     var idx = parseInt(id.substr(6));
-    if(lastOnStati["washer"][idx])
-      setSubscribeTarget(id);
+    if(lastOnStati["washer"][idx] !== 1)
+      id = null;
   } else if(id.substr(0,5) === "dryer") {
     var idx = parseInt(id.substr(5));
-    if(lastOnStati["dryer"][idx])
-      setSubscribeTarget(id);
+    if(lastOnStati["dryer"][idx] !== 1)
+      id = null;
   }
-});
-$(".washers").mouseenter(function(evt) {
-  setSubscribeTarget("any washer");
-});
-$(".dryers").mouseenter(function(evt) {
-  setSubscribeTarget("any dryer");
+  
+  if(id == null) {
+    $("#confirm").css("color", "red");
+    $("#confirm").text("Please select a running machine.");
+    return;
+  }
+
+  var parsed = parseContact($("#notify").val());
+
+  if (parsed.contact === '') {
+    $("#confirm").css("color", "red");
+    $("#confirm").text("Please enter contact information.");
+    return;
+  }
+
+  socket.emit("subscribe", {
+    contact: parsed.contact,
+    target: id,
+  });
+  socket.on("subscribe", function (success) {
+    if (success) {
+      $("#confirm").css("color", "green");
+      $("#confirm").text(parsed.medium+" will be sent to "+parsed.contact+" when "
+			 +humanReadables[id]+" finishes.");
+    } else {
+      $("#confirm").css("color", "red");
+      $("#confirm").text("Notification queue for "+humanReadables[id]
+			 +" is full.");
+    }
+  });
 });
 
-$(".status").mouseleave(function(evt) {
-  console.log(evt.target);
+$("#test").on("click", function() {
+  parsed = parseContact($("#notify").val());
+  if (parsed.contact !== "") {
+    socket.emit("subscribe", {
+      contact: parsed.contact,
+      target: "test"
+    });
+    $("#confirm").css("color", "black");
+    $("#confirm").text("Sending test "+parsed.medium.toLowerCase()+" to "+parsed.contact);
+  } else {
+    $("#confirm").css("color", "red");
+    $("#confirm").text("Please enter contact information.");
+  }
 });

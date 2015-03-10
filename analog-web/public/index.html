@@ -64,14 +64,37 @@
           </div>
         </div>
       </div>
-      <div class="declaration">
-        I want to know when
-        <span id="machine-name">_______</span>
-        is done (mouse over to select).<br/>
-        <span style="padding-left: 1em;">--
-          <input type="text" id="email"
-                 placeholder="random-laundry-empress@mit.edu" size="21"/>
-        </span>
+      <div class="text">
+	<p>To receive a notification when a machine finishes running,
+	click on its icon.</p>
+	Contact information: <input type="text" id="notify"
+          placeholder="random-laundry-empress@mit.edu" size="21"/><br/>
+	<b><span id="contact"></span></b><br/>
+	<button id="test">Send test message</button>
+	<p id="confirm"></p>
+        <p>
+	  Contact info can be:
+	  <ul>
+	    <li>Email address</li>
+	    <li>Kerberos (for personal zephyr)</li>
+	    <li>Cellphone number (for text)</li>
+	  </ul>
+	</p>
+	<p id="cellphone">(Text
+	  notifications currently only work if your cell provider has
+	  email-to-text and their address is
+	  on <a href="providers.html">our list</a>. <!-- If you request
+	  text notifications, you should receive a test message
+	  shortly; if you don't, your provider isn't supported, and
+	  you'll need to use email or zephyr instead.  If you already
+	  know your number works, you can enter your number followed
+	  by an exclamation point (e.g. 0123456789!)  to disable the test
+	  message. --> If you'd like us to try and add your provider,
+	  email imperial-consorts at mit dot edu.)</p>
+	<p class="updates">
+	  For updates on the status of the laundry server, subscribe
+	  to -c random-laundry on zephyr or blanche yourself onto
+	  imperial-subjects.</p>
       </div>
     </div>
   </div>

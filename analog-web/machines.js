@@ -2,24 +2,25 @@ var SerialPort = require("serialport").SerialPort;
 var events = require('events');
 var util = require('util');
 var _ = require('underscore');
+var fs = require('fs');
 
-function Machines(count) {
+function Machines(stati) {
+  var count = stati.length;
   this.serialPort = null;
   this.lastReceived = "";
   this.buf = "";
-  this.lastEvents = []; //when the last event (alteration in the current) happened
-  this.onStatus = []; //whether each machine is on
-  this.transitionings = []; //whether each machine is in a state of transition
+  this.onStatus = stati; // status of each machine: 0=off, 1=on, 2=broken
+  this.lastHighs = [];
   this.transitions = []; //when each machine last turned on or off
   for(var i = 0; i < count; i++) {
-    this.onStatus.push(false);
-    this.transitionings.push(false);
+    //this.onStatus.push(0);
     this.transitions.push(Date.now());
-    this.lastEvents.push(Date.now());
+    this.lastHighs.push(Date.now());
   }
-  this.transDelayDown = 77000;
-  this.transDelayUp = 1700;
-  this.currentCutoff = 0.75;
+  this.onThreshold = 2.0;
+  this.offThreshold = 1.5;
+  this.ludicrousCurrent = 40;  // ignore freak measurement errors
+  this.maxHighInterval = 60000;
 }
 
 util.inherits(Machines, events.EventEmitter);
@@ -39,7 +40,7 @@ Machines.prototype.createMachines = function(path, br) {
 Machines.prototype.onData = function(data) {
   this.buf += data;
   var splot = this.buf.split("\n");
-  if(splot.length == 1) return; //return until a full line has been received
+  if(splot.length === 1) return; //return until a full line has been received
 
   this.lastReceived = splot[0];
   this.buf = splot[1]; //save overfill
@@ -47,50 +48,42 @@ Machines.prototype.onData = function(data) {
   if(!this.lastReceived) return; //if nothing has been received, return
 
   var vals = _.map(this.lastReceived.split(" "), parseFloat); //get currents
-  //console.log(vals);
+
+  switch (vals.length) {
+  case 3:
+    logfile = "/var/log/laundry/washers.log";
+    break;
+  case 4:
+    logfile = "/var/log/laundry/dryers.log";
+    break;
+  default:
+    logfile = "/dev/null";
+    break;
+  }
+  fs.appendFile(logfile, Date.now()+": ")
   this.emit("rawdata", vals); //emit current values to the application
 
   //for every machine being tracked
   for(var i = 0; i < vals.length && i < this.onStatus.length; i++) {
-    //if it is on;
-    if( this.onStatus[i] ) {
-      //if current is high it's expected (the machine is on)
-      if(vals[i] > this.currentCutoff) {
-        this.transitionings[i] = false;
-        continue; //expected, ignore
-      }
-      //current must be low
-      if(!this.transitionings[i]) {
-        this.transitionings[i] = true;
-        this.lastEvents[i] = Date.now();
-      }
-      //transition into off, current has been low for transDelayDown
-      if(Date.now() - this.lastEvents[i] > this.transDelayDown) {
-        //console.log(i+" is now down because "+vals[i]);
-        this.onStatus[i] = false;
-        this.transitions[i] = Date.now();
+    if (isNaN(vals[i]) || vals[i] > this.ludicrousCurrent)
+      continue;
+    if (vals[i] > this.offThreshold) {
+      if (this.onStatus[i] === 0 && vals[i] > this.onThreshold) {
+	this.onStatus[i] = 1;
+	this.transitions[i] = Date.now();
         this.emit("status", this.getStatus());
       }
-    } else {
-      //the laundry is low
-      //current is low, it's expected
-      if(vals[i] < this.currentCutoff) {
-        this.transitionings[i] = false;
-        continue; //expected, ignore
-      }
-      if(!this.transitionings[i]) {
-        this.transitionings[i] = true;
-        this.lastEvents[i] = Date.now();
-      }
-      //transition to on
-      if(Date.now() - this.lastEvents[i] > this.transDelayUp) {
-        //console.log(i+" is now up because "+vals[i]);
-        this.onStatus[i] = true;
-        this.transitions[i] = Date.now();
-        this.emit("status", this.getStatus());
-      }
+      this.lastHighs[i] = Date.now();
+    } else if (this.onStatus[i] === 1
+	       && Date.now() - this.lastHighs[i] > this.maxHighInterval) {
+      this.onStatus[i] = 0;
+      this.transitions[i] = Date.now();
+      this.emit("status", this.getStatus());
     }
+    fs.appendFile(logfile, (vals[i].toFixed(2)+","
+			    +this.onStatus[i]+","));
   }
+  fs.appendFile(logfile, "\n");
 };
 
 Machines.prototype.getStatus = function() {

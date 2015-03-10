@@ -1,0 +1,12 @@
+[Unit]
+Description=Laundry server
+Requires=networking.service zhm.service
+After=networking.service zhm.service
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/forever start --append -l /var/log/laundry/forever.log -o /var/log/laundry/out.log -e /var/log/laundry/err.log --minUptime 10000 /home/pi/get-your-fucking-laundry/analog-web/app.js
+ExecStop=/usr/local/bin/forever stop /home/pi/get-your-fucking-laundry/analog-web/app.js
+
+[Install]
+WantedBy=multi-user.target

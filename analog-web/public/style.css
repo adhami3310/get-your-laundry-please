@@ -53,12 +53,10 @@ svg {
   font-size: 30px;
 }
 
-.declaration {
+div.text {
   float: left;
   clear: right;
   padding-top: 1em;
-  padding-left: 1em;
-}
-
-#machine-name {
+  padding-left: 2em;
+  width: 366px;
 }
