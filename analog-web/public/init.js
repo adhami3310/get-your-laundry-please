@@ -145,9 +145,9 @@ $(".status, .status *, .notify").on("click", function(evt) {
 
   var match;
   if (match = id.match(/(washer|dryer)Any/)) {
-    if (_.every(lastOnStati[match[1]], _.negate(_.partial(_.isEqual, 1)))) {
-      $("#confirm").css("black");
-      $("#confirm").text("No "+match[1]+"s are currently running.");
+    if (_.some(lastOnStati[match[1]], _.partial(_.isEqual, 0))) {
+      $("#confirm").css("color", "red");
+      $("#confirm").text("There are already "+match[1]+"s available.");
       return;
     }
   }
