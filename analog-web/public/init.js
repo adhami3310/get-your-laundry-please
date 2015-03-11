@@ -144,22 +144,18 @@ $(".status, .status *, .notify").on("click", function(evt) {
   var id = $(evt.target).closest(".status, .notify")[0].id;
 
   var match;
-  if (match = id.match(/(washer|dryer)Any/)) {
-    if (_.some(lastOnStati[match[1]], _.partial(_.isEqual, 0))) {
-      $("#confirm").css("color", "red");
-      $("#confirm").text("There are already "+match[1]+"s available.");
-      return;
+  if (match = id.match(/^(washer|dryer)(.+)$/)) {
+    if (match[2] === "Any") {
+      if (_.some(lastOnStati[match[1]], _.partial(_.isEqual, 0))) {
+	$("#confirm").css("color", "red");
+	$("#confirm").text("There are already "+match[1]+"s available.");
+	return;
+      }
+    } else {
+      var idx = parseInt(match[2]);
+      if(lastOnStati[match[1]][idx] !== 1)
+	id = null;
     }
-  }
-  
-  if(id.substr(0,6) === "washer") {
-    var idx = parseInt(id.substr(6));
-    if(lastOnStati["washer"][idx] !== 1)
-      id = null;
-  } else if(id.substr(0,5) === "dryer") {
-    var idx = parseInt(id.substr(5));
-    if(lastOnStati["dryer"][idx] !== 1)
-      id = null;
   }
   
   if(id == null) {
