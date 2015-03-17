@@ -9,6 +9,7 @@ socket.on("washers", function(data) {
 socket.on("dryers", function(data) {
   console.log("dryer status: ");
   console.log(data);
+  data.onStatus[3] = 2; // hack to deal with broken dryer
   updateStati("dryer", data);
 });
 

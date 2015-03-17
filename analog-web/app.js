@@ -20,9 +20,9 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
   }
 });
 var Machines = require('./machines.js');
-var washers = new Machines([0,2,0]);  // ugly hack to deal with broken machines
+var washers = new Machines(3);
 washers.createMachines("/dev/ttyUSB1", 9600);
-var dryers = new Machines([0,0,0,0]);
+var dryers = new Machines(4);
 dryers.createMachines("/dev/ttyUSB0", 9600);
 /* USB1 and USB0 were originally the other way around, but looking at the
  * data coming in on the serial ports, it's clear that the washers are on USB1

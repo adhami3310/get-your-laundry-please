@@ -4,16 +4,15 @@ var util = require('util');
 var _ = require('underscore');
 var fs = require('fs');
 
-function Machines(stati) {
-  var count = stati.length;
+function Machines(count) {
   this.serialPort = null;
   this.lastReceived = "";
   this.buf = "";
-  this.onStatus = stati; // status of each machine: 0=off, 1=on, 2=broken
+  this.onStatus = []; // status of each machine: 0=off, 1=on, 2=broken
   this.lastHighs = [];
   this.transitions = []; //when each machine last turned on or off
   for(var i = 0; i < count; i++) {
-    //this.onStatus.push(0);
+    this.onStatus.push(0);
     this.transitions.push(Date.now());
     this.lastHighs.push(Date.now());
   }
