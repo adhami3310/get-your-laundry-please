@@ -4,6 +4,7 @@ var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
 var _ = require('underscore');
 var zephyr = require('zephyr');
+var auth = require('./auth.js');
 
 zephyr.initialize();
 zephyr.openPort();
@@ -14,10 +15,7 @@ io.configure(function(){
 var nodemailer = require("nodemailer");
 var smtpTransport = nodemailer.createTransport("SMTP",{
   service: "Gmail",
-  auth: {
-    user: "random.laundry.empress@gmail.com",
-    pass: "ozoksocket"
-  }
+  auth: auth.login
 });
 var Machines = require('./machines.js');
 var washers = new Machines(3);
