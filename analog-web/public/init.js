@@ -3,13 +3,22 @@ var socket = io.connect("http://laundry.mit.edu");
 socket.on("washers", function(data) {
   console.log("washer status: ");
   console.log(data);
+  for(var i = 0; i < data.onStatus.length; i++) {
+    if (badWashers[i]) {
+      data.onStatus[i] = 2;
+    }
+  }
   updateStati("washer", data);
 });
 
 socket.on("dryers", function(data) {
   console.log("dryer status: ");
   console.log(data);
-  data.onStatus[3] = 2; // hack to deal with broken dryer
+  for(var i = 0; i < data.onStatus.length; i++) {
+    if (badDryers[i]) {
+      data.onStatus[i] = 2;
+    }
+  }
   updateStati("dryer", data);
 });
 
