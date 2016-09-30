@@ -14,8 +14,9 @@ io.configure(function(){
 });
 var nodemailer = require("nodemailer");
 var smtpTransport = nodemailer.createTransport("SMTP",{
-  service: "Gmail",
-  auth: auth.login
+  host: "outgoing.mit.edu",
+  port: 25,
+  secure: true
 });
 var Machines = require('./machines.js');
 var washers = new Machines(3);
@@ -78,7 +79,7 @@ io.sockets.on("connection", function(socket) {
 
 function sendMail(email, subject) {
   smtpTransport.sendMail({
-      from: "Laundry Server <random.laundry.empress@gmail.com>", // sender address
+      from: "Laundry Server <random-laundry-server@mit.edu>", // sender address
       to: email, // list of receivers
       subject: "[Laundry] "+subject,
       text: "resistance is futile" // plaintext body
@@ -121,7 +122,7 @@ function sendText(number, message) {
   _.each(providers, function(provider) {
     var email = provider.email.replace('%s', number);
     smtpTransport.sendMail({
-      from: "random.laundry.empress@gmail.com", // sender address
+      from: "random-laundry-server@mit.edu", // sender address
       to: email, // list of receivers
       subject: "Text",
       text: message // plaintext body
