@@ -1,23 +1,25 @@
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
-var io = require('socket.io').listen(server);
+var bodyParser = require('body-parser');
+var io  = require('socket.io')(server,{
+	'log level': 1
+});
+
 var _ = require('underscore');
-var zephyr = require('zephyr');
+//var zephyr = require('zephyr');
 var auth = require('./auth.js');
 
-zephyr.initialize();
-zephyr.openPort();
+//zephyr.initialize();
+//zephyr.openPort();
 
-io.configure(function(){
-  io.set('log level', 1);
-});
-var nodemailer = require("nodemailer");
-var smtpTransport = nodemailer.createTransport("SMTP",{
-  host: "outgoing.mit.edu",
-  port: 25,
-  secure: true
-});
+
+//var nodemailer = require("nodemailer");
+//var smtpTransport = nodemailer.createTransport({
+//  host: "outgoing.mit.edu",
+//  port: 25,
+//  secure: true
+//});
 var Machines = require('./machines.js');
 var washers = new Machines(3);
 washers.createMachines("/dev/ttyUSB1", 9600);
@@ -27,11 +29,13 @@ dryers.createMachines("/dev/ttyUSB0", 9600);
  * data coming in on the serial ports, it's clear that the washers are on USB1
  * and the dryers are on USB0 */
 
-app.configure(function() {
-  app.set('port', 80);
-  app.use(express.bodyParser());
-  app.use(express.static(__dirname+'/public'));
-});
+app.set('port', 80);
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(bodyParser.json());
+app.use(express.static(__dirname+'/public'));
+
 
 
 
@@ -77,82 +81,82 @@ io.sockets.on("connection", function(socket) {
 });
 
 
-function sendMail(email, subject) {
-  smtpTransport.sendMail({
-      from: "Laundry Server <random-laundry-server@mit.edu>", // sender address
-      to: email, // list of receivers
-      subject: "[Laundry] "+subject,
-      text: "resistance is futile" // plaintext body
-  }, function(error, response) {
-    if(error){
-      console.log(error);
-    } else {
-      console.log("Message sent: " + response.message);
-    }
-  });
-}
+//function sendMail(email, subject) {
+//  smtpTransport.sendMail({
+//      from: "Laundry Server <random-laundry-server@mit.edu>", // sender address
+//      to: email, // list of receivers
+//      subject: "[Laundry] "+subject,
+//      text: "resistance is futile" // plaintext body
+//  }, function(error, response) {
+//    if(error){
+//      console.log(error);
+//    } else {
+//      console.log("Message sent: " + response.message);
+//    }
+//  });
+//}
 
-function sendZephyr(user, message) {
-  var notice = zephyr.sendNotice({
-    port: 1,
-    recipient: user+'@ATHENA.MIT.EDU',
-    sender: 'random-laundry-empress',
-    body: [
-      'Her Imperious Laundrycension',
-      message
-    ]
-  }, zephyr.ZNOAUTH, function(err) {
-    if (err) {
-      console.error('Failed to send notice', err);
-      return;
-    }
-    console.log('got HMACK');
-  }).on('servack', function(err, msg) {
-    if (err) {
-      console.error('got SERVNAK', err);
-      return;
-    }
-    console.log('got SERVACK', msg);
-  });
-  console.log('uid', notice.uid);
-}
+//function sendZephyr(user, message) {
+//  var notice = zephyr.sendNotice({
+//    port: 1,
+//    recipient: user+'@ATHENA.MIT.EDU',
+//    sender: 'random-laundry-empress',
+//    body: [
+//      'Her Imperious Laundrycension',
+//      message
+//    ]
+//  }, zephyr.ZNOAUTH, function(err) {
+//    if (err) {
+//      console.error('Failed to send notice', err);
+//      return;
+//    }
+//    console.log('got HMACK');
+//  }).on('servack', function(err, msg) {
+//    if (err) {
+//      console.error('got SERVNAK', err);
+//      return;
+//    }
+//    console.log('got SERVACK', msg);
+//  });
+//  console.log('uid', notice.uid);
+//}
 
-var providers = require('./public/providers.js').providers;
-function sendText(number, message) {
-  _.each(providers, function(provider) {
-    var email = provider.email.replace('%s', number);
-    smtpTransport.sendMail({
-      from: "random-laundry-server@mit.edu", // sender address
-      to: email, // list of receivers
-      subject: "Text",
-      text: message // plaintext body
-    }, function(error, response) {
-      if(error){
-	console.log(error);
-      } else {
-	console.log("Message sent: " + response.message);
-      }
-    });
-  });
-}
+//var providers = require('./public/providers.js').providers;
+//function sendText(number, message) {
+//  _.each(providers, function(provider) {
+//    var email = provider.email.replace('%s', number);
+//    smtpTransport.sendMail({
+//      from: "random-laundry-server@mit.edu", // sender address
+//      to: email, // list of receivers
+//      subject: "Text",
+//      text: message // plaintext body
+//    }, function(error, response) {
+//      if(error){
+//	console.log(error);
+//      } else {
+//	console.log("Message sent: " + response.message);
+//      }
+//    });
+//  });
+//}
 
 function notify(target, message) {
   var medium = null;
   var send = null;
   if (target.match(/^\d{10}$/)) { // it's a phone number
-    medium = "text";
-    send = sendText;
+//    medium = "text";
+//    send = sendText;
   } else if (target.indexOf("@") !== -1) {  // it's an email, I guess?
-    medium = "email";
-    send = sendMail;
+//    medium = "email";
+//    send = sendMail;
   } else {
-    medium = "zephyr";
-    send = sendZephyr;
+//    medium = "zephyr";
+//    send = sendZephyr;
   }
-  console.log("sending "+medium+" to "+target);
-  send(target, message);
+//  console.log("sending "+medium+" to "+target);
+//  send(target, message);
 }
-  
+
 function makeCheckFunction(type) {
   return function(onStati) {
     //todo wildcards

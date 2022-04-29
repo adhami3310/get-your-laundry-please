@@ -1,7 +1,7 @@
 [Unit]
 Description=Laundry server
-Requires=networking.service zhm.service
-After=networking.service zhm.service
+Requires=networking.service
+After=networking.service
 
 [Service]
 Type=forking

@@ -1,4 +1,5 @@
-var SerialPort = require("serialport").SerialPort;
+
+var SerialPort = require("serialport");
 var events = require('events');
 var util = require('util');
 var _ = require('underscore');
@@ -17,33 +18,39 @@ function Machines(count) {
     this.lastHighs.push(Date.now());
   }
   this.onThreshold = 2.0;
-  this.offThreshold = 1.5;
+  this.offThreshold = 2.0;
   this.ludicrousCurrent = 40;  // ignore freak measurement errors
   this.maxHighInterval = 60000;
 }
 
 util.inherits(Machines, events.EventEmitter);
 
+var Readline = require('@serialport/parser-readline');
+
 Machines.prototype.createMachines = function(path, br) {
-  this.serialPort = new SerialPort(path, {baudrate: br});
+  this.serialPort = new SerialPort(path, {baudRate: br});
+  var parser = this.serialPort.pipe(new Readline({ delimiter: '\n'}));
   console.log("serialPort: "+this.serialPort);
-  var self = this; //stupid
-  this.serialPort.on("open", function () {
+  this.serialPort.on("open", () => {
     console.log("opened");
-    self.serialPort.on('data', function(data) {
-      self.onData(data);
-    });
+  });
+  var self = this;
+  parser.on('data', data =>{
+    self.onData(data);
   });
 };
 
+console.log("wanted machines");
+
 Machines.prototype.onData = function(data) {
-  this.buf += data;
+  this.buf = data+"\n";
   var splot = this.buf.split("\n");
   if(splot.length === 1) return; //return until a full line has been received
 
   this.lastReceived = splot[0];
   this.buf = splot[1]; //save overfill
 
+  console.log("what does the machine say");
   if(!this.lastReceived) return; //if nothing has been received, return
 
   var vals = _.map(this.lastReceived.split(" "), parseFloat); //get currents
@@ -59,9 +66,9 @@ Machines.prototype.onData = function(data) {
     logfile = "/dev/null";
     break;
   }
-  fs.appendFile(logfile, Date.now()+": ")
+//  fs.appendFile(logfile, Date.now()+": ")
+  console.log(splot[0]);
   this.emit("rawdata", vals); //emit current values to the application
-
   //for every machine being tracked
   for(var i = 0; i < vals.length && i < this.onStatus.length; i++) {
     if (isNaN(vals[i]) || vals[i] > this.ludicrousCurrent)
@@ -79,10 +86,11 @@ Machines.prototype.onData = function(data) {
       this.transitions[i] = Date.now();
       this.emit("status", this.getStatus());
     }
-    fs.appendFile(logfile, (vals[i].toFixed(2)+","
-			    +this.onStatus[i]+","));
+//    console.log(vals[i].toFixed(2)+","+this.onStatus[i]+",");
+//    fs.appendFile(logfile, (vals[i].toFixed(2)+","
+//			    +this.onStatus[i]+","));
   }
-  fs.appendFile(logfile, "\n");
+//  fs.appendFile(logfile, "\n");
 };
 
 Machines.prototype.getStatus = function() {
