@@ -1,2 +1,2 @@
-var badWashers = [false, false, false]
-var badDryers = [false, false, false, false]
+var badWashers = [false, true, false]
+var badDryers = [false, true, true, false]
