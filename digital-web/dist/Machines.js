@@ -25,6 +25,7 @@ var MachineStatus;
 class Machines {
     constructor(name, count, path, br) {
         this.name = name;
+        this.count = count;
         this.buffer = "";
         this.history = [];
         this.serialPort = new serialport_1.SerialPort({ path: path, baudRate: br });
@@ -41,7 +42,7 @@ class Machines {
     getStatus() {
         return [...this.status];
     }
-    toString() {
+    getStatusString() {
         return this.status.map((status) => {
             if (status === MachineStatus.ON)
                 return "ON";
@@ -52,6 +53,18 @@ class Machines {
             return "BROKEN";
         }).join(" ");
     }
+    toJSON() {
+        return {
+            count: this.count,
+            name: this.name,
+            path: this.serialPort.path,
+            baudRate: this.serialPort.baudRate,
+            status: this.getStatus()
+        };
+    }
+    toString() {
+        return `${this.name}: ${this.getStatus()}`;
+    }
     onData(data) {
         this.buffer += data + "\n";
         const lines = this.buffer.split("\n");
@@ -60,8 +73,10 @@ class Machines {
         const firstLine = lines[0];
         (0, assert_1.default)(firstLine !== undefined);
         this.buffer = lines.slice(1).join("\n");
-        console.log(`${this.name}: ${firstLine}`);
         const values = firstLine.split(" ").map(val => parseFloat(val));
+        if (values.length != this.count)
+            return;
+        console.log(`${this.name}: ${firstLine}`);
         this.history.push(values);
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i];
@@ -85,7 +100,7 @@ class Machines {
             }
             const historyAverage = historyValues.reduce((a, b) => a + b, 0) / historyValues.length;
             const shortAverage = shortValues.reduce((a, b) => a + b, 0) / shortValues.length;
-            console.log(`${this.name}[${i}]: ${shortAverage} and ${historyAverage}`);
+            console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)} and ${Math.floor(historyAverage * 100)}`);
             if (currentStatus === MachineStatus.NOIDEA) {
                 if (shortAverage >= ON_THRESHOLD && shortValues.length * DELAY >= SIGNFIFICANT_RATIO * SHORT_TIME) {
                     this.changeStatus(i, MachineStatus.ON);

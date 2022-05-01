@@ -20,7 +20,7 @@ export class Machines {
     private readonly status: Array<MachineStatus>;
     private readonly history: Array<Array<number>> = [];
 
-    public constructor(public readonly name: string, count: number, path: string, br: number) {
+    public constructor(public readonly name: string, public readonly count: number, path: string, br: number) {
         this.serialPort = new SerialPort({ path: path, baudRate: br });
         this.status = Array(count).fill(MachineStatus.NOIDEA);
         let parser = this.serialPort.pipe(new ReadlineParser({ delimiter: '\n' }));
@@ -37,13 +37,27 @@ export class Machines {
         return [...this.status];
     }
 
-    public toString(): string {
+    public getStatusString(): string {
         return this.status.map((status) => {
             if (status === MachineStatus.ON) return "ON";
             if (status === MachineStatus.OFF) return "OFF";
             if (status === MachineStatus.NOIDEA) return "NOIDEA";
             return "BROKEN";
         }).join(" ");
+    }
+
+    public toJSON(): Object {
+        return {
+            count: this.count,
+            name: this.name,
+            path: this.serialPort.path,
+            baudRate: this.serialPort.baudRate,
+            status: this.getStatus()
+        }
+    }
+
+    public toString(): string {
+        return `${this.name}: ${this.getStatus()}`;
     }
 
     private onData(data: any): void {
@@ -53,8 +67,9 @@ export class Machines {
         const firstLine = lines[0];
         assert(firstLine !== undefined);
         this.buffer = lines.slice(1).join("\n");
-        console.log(`${this.name}: ${firstLine}`);
         const values = firstLine.split(" ").map(val => parseFloat(val));
+        if (values.length != this.count) return;
+        console.log(`${this.name}: ${firstLine}`);
         this.history.push(values);
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i]!;
@@ -77,7 +92,7 @@ export class Machines {
             }
             const historyAverage = historyValues.reduce((a, b) => a + b, 0) / historyValues.length;
             const shortAverage = shortValues.reduce((a, b) => a + b, 0) / shortValues.length;
-            console.log(`${this.name}[${i}]: ${shortAverage} and ${historyAverage}`);
+            console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)} and ${Math.floor(historyAverage * 100)}`);
             if (currentStatus === MachineStatus.NOIDEA) {
                 if (shortAverage >= ON_THRESHOLD && shortValues.length * DELAY >= SIGNFIFICANT_RATIO * SHORT_TIME) {
                     this.changeStatus(i, MachineStatus.ON);
