@@ -10,7 +10,10 @@ const path_1 = __importDefault(require("path"));
 const app = (0, express_1.default)();
 const washers = new Machines_1.Machines('Washers', 3, '/dev/ttyUSB1', 9600);
 const dryers = new Machines_1.Machines('Dryers', 4, '/dev/ttyUSB0', 9600);
-app.use('/', (requestion, response) => {
+app.use('/dist/LaundryElement.js', (request, response) => {
+    response.sendFile(path_1.default.join(__dirname, '../dist/LaundryElement.js'));
+});
+app.use('/index.html', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../public/index.html'));
 });
 app.use('/watch', (request, response) => {
