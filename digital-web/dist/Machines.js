@@ -67,7 +67,6 @@ class Machines {
                 continue;
             const historyValues = [];
             const shortValues = [];
-            console.log(this.history);
             for (let j = Math.max(0, Math.floor(this.history.length - HISTORY_TIME / DELAY)); j < this.history.length; j++) {
                 const value = this.history[j][i];
                 if (value !== undefined && value != NaN && value <= LUDICROUS_CURRENT)
