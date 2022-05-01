@@ -13,7 +13,7 @@ app.use('/', (request, response) => {
     response.status(http_status_codes_1.default.ACCEPTED).type("json").send({ "washers": washers.toJSON(), "dryers": dryers.toJSON() });
     // response.status(HttpStatus.ACCEPTED).type("text").send(`${washers.toString()}\n${dryers.toString()}\n`);
 });
-app.listen(8080, () => {
+app.listen(80, () => {
     console.log("listening");
 });
 //# sourceMappingURL=index.js.map
