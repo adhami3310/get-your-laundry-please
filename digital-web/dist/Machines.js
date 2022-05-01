@@ -13,6 +13,7 @@ const DELAY = 2; // number of seconds between two incoming inputs from the ardui
 const LUDICROUS_CURRENT = 40; // above this the machine is acting weird and prob sth happened wrong
 const ON_THRESHOLD = 1; //the threshold to become ON
 const OFF_THRESHOLD = 1; //the threshold to become OFF
+const SIGNFIFICANT_RATIO = 1 / 2; //the minimum threshold of data present in the last time
 var MachineStatus;
 (function (MachineStatus) {
     MachineStatus[MachineStatus["ON"] = 0] = "ON";
@@ -22,7 +23,8 @@ var MachineStatus;
 })(MachineStatus = exports.MachineStatus || (exports.MachineStatus = {}));
 ;
 class Machines {
-    constructor(count, path, br) {
+    constructor(name, count, path, br) {
+        this.name = name;
         this.buffer = "";
         this.history = [];
         this.serialPort = new serialport_1.SerialPort({ path: path, baudRate: br });
@@ -58,7 +60,7 @@ class Machines {
         const firstLine = lines[0];
         (0, assert_1.default)(firstLine !== undefined);
         this.buffer = lines.slice(1).join("\n");
-        console.log("what does the machine say?", firstLine);
+        console.log(`${this.name}: ${firstLine}`);
         const values = firstLine.split(" ").map(val => parseFloat(val));
         this.history.push(values);
         for (let i = 0; i < this.status.length; i++) {
@@ -84,20 +86,20 @@ class Machines {
             const historyAverage = historyValues.reduce((a, b) => a + b, 0) / historyValues.length;
             const shortAverage = shortValues.reduce((a, b) => a + b, 0) / shortValues.length;
             if (currentStatus === MachineStatus.NOIDEA) {
-                if (shortAverage >= ON_THRESHOLD) {
+                if (shortAverage >= ON_THRESHOLD && shortValues.length * DELAY >= SIGNFIFICANT_RATIO * SHORT_TIME) {
                     this.changeStatus(i, MachineStatus.ON);
                 }
-                else if (historyAverage <= OFF_THRESHOLD) {
+                else if (historyAverage <= OFF_THRESHOLD && historyValues.length * DELAY >= SIGNFIFICANT_RATIO * HISTORY_TIME) {
                     this.changeStatus(i, MachineStatus.OFF);
                 }
             }
             else if (currentStatus === MachineStatus.OFF) {
-                if (shortAverage >= ON_THRESHOLD) {
+                if (shortAverage >= ON_THRESHOLD && shortValues.length * DELAY >= SIGNFIFICANT_RATIO * SHORT_TIME) {
                     this.changeStatus(i, MachineStatus.ON);
                 }
             }
             else if (currentStatus === MachineStatus.ON) {
-                if (shortAverage <= OFF_THRESHOLD && historyAverage <= OFF_THRESHOLD) {
+                if (shortAverage <= OFF_THRESHOLD && historyAverage <= OFF_THRESHOLD && historyValues.length * DELAY >= SIGNFIFICANT_RATIO * HISTORY_TIME) {
                     this.changeStatus(i, MachineStatus.OFF);
                 }
             }

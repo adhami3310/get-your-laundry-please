@@ -8,6 +8,7 @@ const DELAY = 2; // number of seconds between two incoming inputs from the ardui
 const LUDICROUS_CURRENT = 40; // above this the machine is acting weird and prob sth happened wrong
 const ON_THRESHOLD = 1; //the threshold to become ON
 const OFF_THRESHOLD = 1; //the threshold to become OFF
+const SIGNFIFICANT_RATIO = 1 / 2; //the minimum threshold of data present in the last time
 
 export enum MachineStatus {
     ON, OFF, BROKEN, NOIDEA
@@ -19,7 +20,7 @@ export class Machines {
     private readonly status: Array<MachineStatus>;
     private readonly history: Array<Array<number>> = [];
 
-    public constructor(count: number, path: string, br: number) {
+    public constructor(public readonly name: string, count: number, path: string, br: number) {
         this.serialPort = new SerialPort({ path: path, baudRate: br });
         this.status = Array(count).fill(MachineStatus.NOIDEA);
         let parser = this.serialPort.pipe(new ReadlineParser({ delimiter: '\n' }));
@@ -52,12 +53,12 @@ export class Machines {
         const firstLine = lines[0];
         assert(firstLine !== undefined);
         this.buffer = lines.slice(1).join("\n");
-        console.log("what does the machine say?", firstLine);
+        console.log(`${this.name}: ${firstLine}`);
         const values = firstLine.split(" ").map(val => parseFloat(val));
         this.history.push(values);
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i]!;
-            if(currentStatus === MachineStatus.BROKEN) continue;
+            if (currentStatus === MachineStatus.BROKEN) continue;
             const historyValues = [];
             const shortValues = [];
             for (let j = Math.max(0, Math.floor(this.history.length - HISTORY_TIME / DELAY)); j < this.history.length; j++) {
@@ -76,18 +77,18 @@ export class Machines {
             }
             const historyAverage = historyValues.reduce((a, b) => a + b, 0) / historyValues.length;
             const shortAverage = shortValues.reduce((a, b) => a + b, 0) / shortValues.length;
-            if(currentStatus === MachineStatus.NOIDEA) {
-                if(shortAverage >= ON_THRESHOLD) {
+            if (currentStatus === MachineStatus.NOIDEA) {
+                if (shortAverage >= ON_THRESHOLD && shortValues.length * DELAY >= SIGNFIFICANT_RATIO * SHORT_TIME) {
                     this.changeStatus(i, MachineStatus.ON);
-                }else if(historyAverage <= OFF_THRESHOLD) {
+                } else if (historyAverage <= OFF_THRESHOLD && historyValues.length * DELAY >= SIGNFIFICANT_RATIO * HISTORY_TIME) {
                     this.changeStatus(i, MachineStatus.OFF);
                 }
-            }else if(currentStatus === MachineStatus.OFF){
-                if(shortAverage >= ON_THRESHOLD){
+            } else if (currentStatus === MachineStatus.OFF) {
+                if (shortAverage >= ON_THRESHOLD && shortValues.length * DELAY >= SIGNFIFICANT_RATIO * SHORT_TIME) {
                     this.changeStatus(i, MachineStatus.ON);
                 }
-            }else if(currentStatus === MachineStatus.ON) {
-                if(shortAverage <= OFF_THRESHOLD && historyAverage <= OFF_THRESHOLD){
+            } else if (currentStatus === MachineStatus.ON) {
+                if (shortAverage <= OFF_THRESHOLD && historyAverage <= OFF_THRESHOLD && historyValues.length * DELAY >= SIGNFIFICANT_RATIO * HISTORY_TIME) {
                     this.changeStatus(i, MachineStatus.OFF);
                 }
             }

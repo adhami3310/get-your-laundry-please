@@ -6,8 +6,8 @@ import { Machines } from './Machines';
 
 
 const app = express();
-const washers = new Machines(3, '/dev/ttyUSB1', 9600);
-const dryers = new Machines(4, '/dev/ttyUSB0', 9600);
+const washers = new Machines('Washers', 3, '/dev/ttyUSB1', 9600);
+const dryers = new Machines('Dryers', 4, '/dev/ttyUSB0', 9600);
 
 app.use('/', (request, response) => {
     response.status(HttpStatus.ACCEPTED).type("text").send(`WASHERS: ${washers.toString()}\nDRYERS: ${dryers.toString()}\n`);
