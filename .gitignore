@@ -1,5 +1,7 @@
 *.py[cod]
 analog-web/node_modules/
+digital-web/dist/
+digital-web/node_modules/
 # C extensions
 *.so
 
