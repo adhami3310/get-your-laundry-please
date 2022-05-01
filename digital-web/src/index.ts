@@ -13,14 +13,15 @@ app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path.join(__dirname, '../dist/LaundryElement.js'));
 });
 
-app.use('/', (request, response) => {
-    response.sendFile(path.join(__dirname, '../public/index.html'));
-});
-
 app.use('/watch', (request, response) => {
     response.status(HttpStatus.ACCEPTED).type("json").send({ "washers": washers.toJSON(), "dryers": dryers.toJSON() });
     // response.status(HttpStatus.ACCEPTED).type("text").send(`${washers.toString()}\n${dryers.toString()}\n`);
 });
+
+app.use('/', (request, response) => {
+    response.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
 
 app.listen(80, () => {
     console.log("listening");
