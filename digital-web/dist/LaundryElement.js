@@ -262,27 +262,27 @@ class LaundryElement extends HTMLElement {
         return ["state", "transition"];
     }
     attributeChangedCallback(name, oldValue, newValue) {
-        newValue = newValue.toUpperCase();
         if (name === "state") {
+            newValue = newValue.toUpperCase();
             if (!states.has(newValue))
                 return;
             this.machineState = newValue;
+            const shadowRoot = this.shadowRoot;
+            if (shadowRoot) {
+                const machine = shadowRoot.querySelector(".laundry-machine");
+                if (machine) {
+                    if (oldValue === null) {
+                        machine.classList.toggle("UNKNOWN".toLowerCase());
+                    }
+                    else {
+                        machine.classList.toggle(oldValue.toLowerCase());
+                    }
+                    machine.classList.toggle(newValue.toLowerCase());
+                }
+            }
         }
         if (name === "transition") {
             this.lastTransition = newValue;
-        }
-        const shadowRoot = this.shadowRoot;
-        if (shadowRoot) {
-            const machine = shadowRoot.querySelector(".laundry-machine");
-            if (machine) {
-                if (oldValue === null) {
-                    machine.classList.toggle("UNKNOWN".toLowerCase());
-                }
-                else {
-                    machine.classList.toggle(oldValue.toLowerCase());
-                }
-                machine.classList.toggle(newValue.toLowerCase());
-            }
         }
         this.render();
     }
