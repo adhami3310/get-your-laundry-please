@@ -14,6 +14,13 @@ export enum MachineStatus {
     ON, OFF, BROKEN, NOIDEA
 };
 
+function machineStatusToString(status: MachineStatus): string {
+    if(status === MachineStatus.ON) return "ON";
+    if(status === MachineStatus.OFF) return "OFF";
+    if(status === MachineStatus.BROKEN) return "BROKEN";
+    return "UNKNOWN";
+}
+
 export class Machines {
     private readonly serialPort: SerialPort;
     private buffer: string = "";
@@ -38,12 +45,7 @@ export class Machines {
     }
 
     public getStatusString(): string {
-        return this.status.map((status) => {
-            if (status === MachineStatus.ON) return "ON";
-            if (status === MachineStatus.OFF) return "OFF";
-            if (status === MachineStatus.NOIDEA) return "NOIDEA";
-            return "BROKEN";
-        }).join(" ");
+        return this.status.map(status => machineStatusToString(status)).join(" ");
     }
 
     public toJSON(): Object {
@@ -52,7 +54,7 @@ export class Machines {
             name: this.name,
             path: this.serialPort.path,
             baudRate: this.serialPort.baudRate,
-            status: this.getStatus()
+            status: this.getStatus().map(machineStatusToString)
         }
     }
 

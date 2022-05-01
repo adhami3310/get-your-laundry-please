@@ -22,6 +22,15 @@ var MachineStatus;
     MachineStatus[MachineStatus["NOIDEA"] = 3] = "NOIDEA";
 })(MachineStatus = exports.MachineStatus || (exports.MachineStatus = {}));
 ;
+function machineStatusToString(status) {
+    if (status === MachineStatus.ON)
+        return "ON";
+    if (status === MachineStatus.OFF)
+        return "OFF";
+    if (status === MachineStatus.BROKEN)
+        return "BROKEN";
+    return "UNKNOWN";
+}
 class Machines {
     constructor(name, count, path, br) {
         this.name = name;
@@ -43,15 +52,7 @@ class Machines {
         return [...this.status];
     }
     getStatusString() {
-        return this.status.map((status) => {
-            if (status === MachineStatus.ON)
-                return "ON";
-            if (status === MachineStatus.OFF)
-                return "OFF";
-            if (status === MachineStatus.NOIDEA)
-                return "NOIDEA";
-            return "BROKEN";
-        }).join(" ");
+        return this.status.map(status => machineStatusToString(status)).join(" ");
     }
     toJSON() {
         return {
@@ -59,7 +60,7 @@ class Machines {
             name: this.name,
             path: this.serialPort.path,
             baudRate: this.serialPort.baudRate,
-            status: this.getStatus()
+            status: this.getStatus().map(machineStatusToString)
         };
     }
     toString() {
