@@ -21,7 +21,7 @@ export class Machines {
 
     public constructor(count: number, path: string, br: number) {
         this.serialPort = new SerialPort({ path: path, baudRate: br });
-        this.status = Array(count).fill(MachineStatus.OFF);
+        this.status = Array(count).fill(MachineStatus.NOIDEA);
         let parser = this.serialPort.pipe(new ReadlineParser({ delimiter: '\n' }));
         this.serialPort.on("open", () => {
             console.log("opened");
@@ -60,12 +60,13 @@ export class Machines {
             if(currentStatus === MachineStatus.BROKEN) continue;
             const historyValues = [];
             const shortValues = [];
-            for (let j = this.history.length - HISTORY_TIME / DELAY; j < this.history.length; j++) {
+            console.log(this.history);
+            for (let j = Math.max(0, Math.floor(this.history.length - HISTORY_TIME / DELAY)); j < this.history.length; j++) {
                 const value = this.history[j]![i];
                 if (value !== undefined && value != NaN && value <= LUDICROUS_CURRENT)
                     historyValues.push(value);
             }
-            for (let j = this.history.length - SHORT_TIME / DELAY; j < this.history.length; j++) {
+            for (let j = Math.max(0, Math.floor(this.history.length - SHORT_TIME / DELAY)); j < this.history.length; j++) {
                 const value = this.history[j]![i];
                 if (value !== undefined && value != NaN && value <= LUDICROUS_CURRENT)
                     shortValues.push(value);
