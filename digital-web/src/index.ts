@@ -1,5 +1,5 @@
 import assert from 'assert';
-import express, { Application } from 'express';
+import express, { Application, request } from 'express';
 import { Server } from 'http';
 import HttpStatus from 'http-status-codes';
 import { Machines } from './Machines';
@@ -9,7 +9,11 @@ const app = express();
 const washers = new Machines('Washers', 3, '/dev/ttyUSB1', 9600);
 const dryers = new Machines('Dryers', 4, '/dev/ttyUSB0', 9600);
 
-app.use('/', (requestion, response) => {
+app.use('/dist/LaundryElement.js', (request, response) => {
+    response.sendFile(path.join(__dirname, '../dist/LaundryElement.js'));
+});
+
+app.use('/', (request, response) => {
     response.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
