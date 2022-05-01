@@ -14,6 +14,6 @@ app.use('/', (request, response) => {
     // response.status(HttpStatus.ACCEPTED).type("text").send(`${washers.toString()}\n${dryers.toString()}\n`);
 });
 
-app.listen(80, () => {
+app.listen(8080, () => {
     console.log("listening");
 });
