@@ -10,7 +10,7 @@ const washers = new Machines('Washers', 3, '/dev/ttyUSB1', 9600);
 const dryers = new Machines('Dryers', 4, '/dev/ttyUSB0', 9600);
 
 app.use('/', (requestion, response) => {
-    response.sendFile(path.join(__dirname, '/index.html'));
+    response.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 app.use('/watch', (request, response) => {
