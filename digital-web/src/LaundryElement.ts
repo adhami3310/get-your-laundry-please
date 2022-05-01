@@ -145,12 +145,12 @@ const styles = `
 
 .broken .text{
     color: white;
-    top: -10em;
+    top: -53%;
     font-size: 0.8em;
 }
 
 .unknown .text{
-    top: -8em;
+    top: -55%;
 }
 
 .broken .tub {
@@ -192,7 +192,7 @@ const styles = `
 
 .text {
     position: relative;
-    top: -9.5em;
+    top: -62%;
     display: flex;
     flex-direction: column;
     justify-content: center;
