@@ -273,9 +273,6 @@ class LaundryElement extends HTMLElement {
             newValue = newValue.toUpperCase();
             if (!states.has(newValue)) return;
             this.machineState = newValue;
-        }
-        if (name === "transition") {
-            this.lastTransition = newValue;
             const shadowRoot = this.shadowRoot;
             if (shadowRoot) {
                 const machine = shadowRoot.querySelector(".laundry-machine");
@@ -288,6 +285,9 @@ class LaundryElement extends HTMLElement {
                     machine.classList.toggle(newValue.toLowerCase());
                 }
             }
+        }
+        if (name === "transition") {
+            this.lastTransition = newValue;
         }
         this.render();
     }
