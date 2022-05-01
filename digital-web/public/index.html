@@ -5,11 +5,90 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../dist/LaundryElement.js"></script>
     <title>Laundry Server</title>
+    <style>
+        body {
+            background: rgb(0, 161, 205);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #washer1 {
+            grid-area: washer1;
+        }
+
+        #washer2 {
+            grid-area: washer2;
+        }
+
+        #washer3 {
+            grid-area: washer3;
+        }
+
+        #dryer1 {
+            grid-area: dryer1;
+        }
+
+        #dryer2 {
+            grid-area: dryer2;
+        }
+
+        #dryer3 {
+            grid-area: dryer3;
+        }
+
+        #dryer4 {
+            grid-area: dryer4;
+        }
+
+        #text {
+            grid-area: text;
+        }
+
+        #container {
+            display: grid;
+            grid-template-areas: "empty washer1 washer2 washer3"
+                "dryer1 text text text"
+                "dryer2 text text text"
+                "dryer3 text text text"
+                "dryer4 text text text";
+            width: min-content;
+            gap: 1em;
+            margin: auto;
+        }
+
+        laundry-element {
+            font-size:x-small;
+        }
+        
+        #text {
+            font-size: larger;
+        }
+    </style>
 </head>
 
 <body>
+    <div id="container">
 
+        <laundry-element id="washer1" state="on"></laundry-element>
+        <laundry-element id="washer2" state="unknown"></laundry-element>
+        <laundry-element id="washer3" state="off"></laundry-element>
+        <laundry-element id="dryer1" state="off"></laundry-element>
+        <laundry-element id="dryer2" state="broken"></laundry-element>
+        <laundry-element id="dryer3" state="on"></laundry-element>
+        <laundry-element id="dryer4" state="off"></laundry-element>
+        <div id="text">
+            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Totam iure numquam similique obcaecati, impedit ad
+            pariatur. Amet porro minima eum ipsum magni unde ipsam, corporis temporibus sequi, mollitia perferendis
+            veniam. Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum repellat officia necessitatibus
+            molestias aspernatur eos labore, maiores vitae nisi dicta, iste commodi id nemo numquam ratione quae
+            voluptates, iusto nesciunt? Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quas, voluptate nam.
+            Pariatur sed voluptatum dignissimos molestias error nisi alias quod amet, labore eum earum eos ratione id
+            obcaecati sit quae! Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio placeat ipsum quis
+            molestiae consectetur exercitationem quae fugit possimus molestias cupiditate, adipisci ad laborum cumque
+            deleniti. Soluta accusamus illum temporibus pariatur.
+        </div>
+    </div>
 </body>
 
 </html>
