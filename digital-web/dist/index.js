@@ -13,7 +13,7 @@ const dryers = new Machines_1.Machines('Dryers', 4, '/dev/ttyUSB0', 9600);
 app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../dist/LaundryElement.js'));
 });
-app.use('/index.html', (request, response) => {
+app.use('/', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../public/index.html'));
 });
 app.use('/watch', (request, response) => {
