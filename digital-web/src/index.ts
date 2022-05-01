@@ -13,7 +13,7 @@ app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path.join(__dirname, '../dist/LaundryElement.js'));
 });
 
-app.use('/', (request, response) => {
+app.use('/index.html', (request, response) => {
     response.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
