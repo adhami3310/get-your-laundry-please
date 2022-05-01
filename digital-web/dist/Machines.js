@@ -7,16 +7,24 @@ exports.Machines = exports.MachineStatus = void 0;
 const serialport_1 = require("serialport");
 const parser_readline_1 = require("@serialport/parser-readline");
 const assert_1 = __importDefault(require("assert"));
+const HISTORY_TIME = 60; //number of seonds to use to change data from ON to OFF
+const SHORT_TIME = 30; //number of seonds to use to change data from OFF to ON
+const DELAY = 2; // number of seconds between two incoming inputs from the arduino
+const LUDICROUS_CURRENT = 40; // above this the machine is acting weird and prob sth happened wrong
+const ON_THRESHOLD = 1; //the threshold to become ON
+const OFF_THRESHOLD = 1; //the threshold to become OFF
 var MachineStatus;
 (function (MachineStatus) {
     MachineStatus[MachineStatus["ON"] = 0] = "ON";
     MachineStatus[MachineStatus["OFF"] = 1] = "OFF";
     MachineStatus[MachineStatus["BROKEN"] = 2] = "BROKEN";
+    MachineStatus[MachineStatus["NOIDEA"] = 3] = "NOIDEA";
 })(MachineStatus = exports.MachineStatus || (exports.MachineStatus = {}));
 ;
 class Machines {
     constructor(count, path, br) {
         this.buffer = "";
+        this.history = [];
         this.serialPort = new serialport_1.SerialPort({ path: path, baudRate: br });
         this.status = Array(count).fill(MachineStatus.OFF);
         let parser = this.serialPort.pipe(new parser_readline_1.ReadlineParser({ delimiter: '\n' }));
@@ -37,6 +45,8 @@ class Machines {
                 return "ON";
             if (status === MachineStatus.OFF)
                 return "OFF";
+            if (status === MachineStatus.NOIDEA)
+                return "NOIDEA";
             return "BROKEN";
         }).join(" ");
     }
@@ -50,6 +60,51 @@ class Machines {
         this.buffer = lines.slice(1).join("\n");
         console.log("what does the machine say?", firstLine);
         const values = firstLine.split(" ").map(val => parseFloat(val));
+        this.history.push(values);
+        for (let i = 0; i < this.status.length; i++) {
+            const currentStatus = this.status[i];
+            if (currentStatus === MachineStatus.BROKEN)
+                continue;
+            const historyValues = [];
+            const shortValues = [];
+            for (let j = this.history.length - HISTORY_TIME / DELAY; j < this.history.length; j++) {
+                const value = this.history[j][i];
+                if (value !== undefined && value != NaN && value <= LUDICROUS_CURRENT)
+                    historyValues.push(value);
+            }
+            for (let j = this.history.length - SHORT_TIME / DELAY; j < this.history.length; j++) {
+                const value = this.history[j][i];
+                if (value !== undefined && value != NaN && value <= LUDICROUS_CURRENT)
+                    shortValues.push(value);
+            }
+            if (historyValues.length == 0 || shortValues.length == 0) {
+                this.changeStatus(i, MachineStatus.NOIDEA);
+                continue;
+            }
+            const historyAverage = historyValues.reduce((a, b) => a + b, 0) / historyValues.length;
+            const shortAverage = shortValues.reduce((a, b) => a + b, 0) / shortValues.length;
+            if (currentStatus === MachineStatus.NOIDEA) {
+                if (shortAverage >= ON_THRESHOLD) {
+                    this.changeStatus(i, MachineStatus.ON);
+                }
+                else if (historyAverage <= OFF_THRESHOLD) {
+                    this.changeStatus(i, MachineStatus.OFF);
+                }
+            }
+            else if (currentStatus === MachineStatus.OFF) {
+                if (shortAverage >= ON_THRESHOLD) {
+                    this.changeStatus(i, MachineStatus.ON);
+                }
+            }
+            else if (currentStatus === MachineStatus.ON) {
+                if (shortAverage <= OFF_THRESHOLD && historyAverage <= OFF_THRESHOLD) {
+                    this.changeStatus(i, MachineStatus.OFF);
+                }
+            }
+        }
+    }
+    changeStatus(index, newStatus) {
+        this.status[index] = newStatus;
     }
 }
 exports.Machines = Machines;
