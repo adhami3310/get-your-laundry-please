@@ -60,7 +60,8 @@ class Machines {
             name: this.name,
             path: this.serialPort.path,
             baudRate: this.serialPort.baudRate,
-            status: this.getStatus().map(machineStatusToString)
+            status: this.getStatus().map(machineStatusToString),
+            buffer: this.buffer
         };
     }
     toString() {

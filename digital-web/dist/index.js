@@ -10,7 +10,7 @@ const app = (0, express_1.default)();
 const washers = new Machines_1.Machines('Washers', 3, '/dev/ttyUSB1', 9600);
 const dryers = new Machines_1.Machines('Dryers', 4, '/dev/ttyUSB0', 9600);
 app.use('/', (request, response) => {
-    response.status(http_status_codes_1.default.ACCEPTED).type("json").send({ washers: washers.toJSON(), dryers: dryers.toJSON });
+    response.status(http_status_codes_1.default.ACCEPTED).type("json").send({ "washers": washers.toJSON(), "dryers": dryers.toJSON });
     // response.status(HttpStatus.ACCEPTED).type("text").send(`${washers.toString()}\n${dryers.toString()}\n`);
 });
 app.listen(8080, () => {

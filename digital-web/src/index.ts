@@ -10,7 +10,7 @@ const washers = new Machines('Washers', 3, '/dev/ttyUSB1', 9600);
 const dryers = new Machines('Dryers', 4, '/dev/ttyUSB0', 9600);
 
 app.use('/', (request, response) => {
-    response.status(HttpStatus.ACCEPTED).type("json").send({washers:washers.toJSON(), dryers: dryers.toJSON});
+    response.status(HttpStatus.ACCEPTED).type("json").send({"washers":washers.toJSON(), "dryers": dryers.toJSON});
     // response.status(HttpStatus.ACCEPTED).type("text").send(`${washers.toString()}\n${dryers.toString()}\n`);
 });
 
