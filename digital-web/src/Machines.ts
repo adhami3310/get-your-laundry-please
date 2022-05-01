@@ -77,6 +77,7 @@ export class Machines {
             }
             const historyAverage = historyValues.reduce((a, b) => a + b, 0) / historyValues.length;
             const shortAverage = shortValues.reduce((a, b) => a + b, 0) / shortValues.length;
+            console.log(`${this.name}[${i}]: ${shortAverage} and ${historyAverage}`);
             if (currentStatus === MachineStatus.NOIDEA) {
                 if (shortAverage >= ON_THRESHOLD && shortValues.length * DELAY >= SIGNFIFICANT_RATIO * SHORT_TIME) {
                     this.changeStatus(i, MachineStatus.ON);
