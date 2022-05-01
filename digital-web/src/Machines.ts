@@ -15,9 +15,9 @@ export enum MachineStatus {
 };
 
 function machineStatusToString(status: MachineStatus): string {
-    if(status === MachineStatus.ON) return "ON";
-    if(status === MachineStatus.OFF) return "OFF";
-    if(status === MachineStatus.BROKEN) return "BROKEN";
+    if (status === MachineStatus.ON) return "ON";
+    if (status === MachineStatus.OFF) return "OFF";
+    if (status === MachineStatus.BROKEN) return "BROKEN";
     return "UNKNOWN";
 }
 
@@ -26,10 +26,12 @@ export class Machines {
     private buffer: string = "";
     private readonly status: Array<MachineStatus>;
     private readonly history: Array<Array<number>> = [];
+    private readonly lastTransition: Array<number> = [];
 
     public constructor(public readonly name: string, public readonly count: number, path: string, br: number) {
-        this.serialPort = new SerialPort({ path: path, baudRate: br });
         this.status = Array(count).fill(MachineStatus.NOIDEA);
+        this.lastTransition = Array(count).fill(Date.now());
+        this.serialPort = new SerialPort({ path: path, baudRate: br });
         let parser = this.serialPort.pipe(new ReadlineParser({ delimiter: '\n' }));
         this.serialPort.on("open", () => {
             console.log("opened");
@@ -48,6 +50,11 @@ export class Machines {
         return this.status.map(status => machineStatusToString(status)).join(" ");
     }
 
+    public sinceTransition(): Array<number> {
+        const timeNow = Date.now();
+        return this.lastTransition.map(value => Math.floor((timeNow - value) / 1000));
+    }
+
     public toJSON(): Object {
         return {
             count: this.count,
@@ -55,7 +62,8 @@ export class Machines {
             path: this.serialPort.path,
             baudRate: this.serialPort.baudRate,
             status: this.getStatus().map(machineStatusToString),
-            buffer: this.buffer
+            buffer: this.buffer,
+            sinceTransition: this.sinceTransition()
         }
     }
 
@@ -116,5 +124,6 @@ export class Machines {
 
     private changeStatus(index: number, newStatus: MachineStatus): void {
         this.status[index] = newStatus;
+        this.lastTransition[index] = Date.now();
     }
 }

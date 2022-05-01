@@ -37,8 +37,10 @@ class Machines {
         this.count = count;
         this.buffer = "";
         this.history = [];
-        this.serialPort = new serialport_1.SerialPort({ path: path, baudRate: br });
+        this.lastTransition = [];
         this.status = Array(count).fill(MachineStatus.NOIDEA);
+        this.lastTransition = Array(count).fill(Date.now());
+        this.serialPort = new serialport_1.SerialPort({ path: path, baudRate: br });
         let parser = this.serialPort.pipe(new parser_readline_1.ReadlineParser({ delimiter: '\n' }));
         this.serialPort.on("open", () => {
             console.log("opened");
@@ -54,6 +56,10 @@ class Machines {
     getStatusString() {
         return this.status.map(status => machineStatusToString(status)).join(" ");
     }
+    sinceTransition() {
+        const timeNow = Date.now();
+        return this.lastTransition.map(value => Math.floor((timeNow - value) / 1000));
+    }
     toJSON() {
         return {
             count: this.count,
@@ -61,7 +67,8 @@ class Machines {
             path: this.serialPort.path,
             baudRate: this.serialPort.baudRate,
             status: this.getStatus().map(machineStatusToString),
-            buffer: this.buffer
+            buffer: this.buffer,
+            sinceTransition: this.sinceTransition()
         };
     }
     toString() {
@@ -125,6 +132,7 @@ class Machines {
     }
     changeStatus(index, newStatus) {
         this.status[index] = newStatus;
+        this.lastTransition[index] = Date.now();
     }
 }
 exports.Machines = Machines;
