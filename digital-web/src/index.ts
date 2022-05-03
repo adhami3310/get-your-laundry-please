@@ -13,6 +13,10 @@ app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path.join(__dirname, '../dist/LaundryElement.js'));
 });
 
+app.use('/dist/LaundryElement.js.map', (request, response) => {
+    response.sendFile(path.join(__dirname, '../dist/LaundryElement.js.map'));
+});
+
 app.use('/watch', (request, response) => {
     response.status(HttpStatus.ACCEPTED).type("json").send({ "washers": washers.toJSON(), "dryers": dryers.toJSON() });
     // response.status(HttpStatus.ACCEPTED).type("text").send(`${washers.toString()}\n${dryers.toString()}\n`);
