@@ -2,12 +2,12 @@ import assert from 'assert';
 import express, { Application, request } from 'express';
 import { Server } from 'http';
 import HttpStatus from 'http-status-codes';
-import { Machines } from './Machines';
+import { Machines, MachineStatus } from './Machines';
 import path from 'path';
 
 const app = express();
-const washers = new Machines('Washers', 3, '/dev/ttyUSB1', 9600);
-const dryers = new Machines('Dryers', 4, '/dev/ttyUSB0', 9600);
+const washers = new Machines('Washers', 3, '/dev/ttyUSB1', 9600, [MachineStatus.NONE, MachineStatus.NOIDEA, MachineStatus.NONE]);
+const dryers = new Machines('Dryers', 4, '/dev/ttyUSB0', 9600, [MachineStatus.NONE, MachineStatus.NONE, MachineStatus.NONE, MachineStatus.NONE]);
 
 app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path.join(__dirname, '../dist/LaundryElement.js'));

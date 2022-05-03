@@ -11,7 +11,7 @@ const OFF_THRESHOLD = 1; //the threshold to become OFF
 const SIGNFIFICANT_RATIO = 1 / 2; //the minimum threshold of data present in the last time
 
 export enum MachineStatus {
-    ON, OFF, BROKEN, NOIDEA
+    ON, OFF, BROKEN, NOIDEA, NONE
 };
 
 function machineStatusToString(status: MachineStatus): string {
@@ -27,15 +27,22 @@ export class Machines {
     private readonly status: Array<MachineStatus>;
     private readonly history: Array<Array<number>> = [];
     private readonly lastTransition: Array<number> = [];
+    private readonly forcedStates: Array<MachineStatus> = [];
 
-    public constructor(public readonly name: string, public readonly count: number, path: string, br: number) {
+    public constructor(public readonly name: string, public readonly count: number, path: string, br: number, forcedStates: Array<MachineStatus>) {
         this.status = Array(count).fill(MachineStatus.NOIDEA);
         this.lastTransition = Array(count).fill(Date.now());
+        forcedStates.forEach((state, i) => {
+            if (state !== MachineStatus.NONE) {
+                this.status[i] = state;
+            }
+        });
         this.serialPort = new SerialPort({ path: path, baudRate: br });
         let parser = this.serialPort.pipe(new ReadlineParser({ delimiter: '\n' }));
         this.serialPort.on("open", () => {
             console.log("opened");
         });
+        this.forcedStates = [...forcedStates];
         let self = this;
         parser.on("data", data => {
             self.onData(data);
@@ -85,7 +92,7 @@ export class Machines {
         this.history.push(values);
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i]!;
-            if (currentStatus === MachineStatus.BROKEN) continue;
+            if (currentStatus === MachineStatus.BROKEN || this.forcedStates[i] != MachineStatus.NONE) continue;
             const historyValues = [];
             const shortValues = [];
             for (let j = Math.max(0, Math.floor(this.history.length - HISTORY_TIME / DELAY)); j < this.history.length; j++) {

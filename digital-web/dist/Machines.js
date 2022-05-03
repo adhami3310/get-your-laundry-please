@@ -20,6 +20,7 @@ var MachineStatus;
     MachineStatus[MachineStatus["OFF"] = 1] = "OFF";
     MachineStatus[MachineStatus["BROKEN"] = 2] = "BROKEN";
     MachineStatus[MachineStatus["NOIDEA"] = 3] = "NOIDEA";
+    MachineStatus[MachineStatus["NONE"] = 4] = "NONE";
 })(MachineStatus = exports.MachineStatus || (exports.MachineStatus = {}));
 ;
 function machineStatusToString(status) {
@@ -32,19 +33,26 @@ function machineStatusToString(status) {
     return "UNKNOWN";
 }
 class Machines {
-    constructor(name, count, path, br) {
+    constructor(name, count, path, br, forcedStates) {
         this.name = name;
         this.count = count;
         this.buffer = "";
         this.history = [];
         this.lastTransition = [];
+        this.forcedStates = [];
         this.status = Array(count).fill(MachineStatus.NOIDEA);
         this.lastTransition = Array(count).fill(Date.now());
+        forcedStates.forEach((state, i) => {
+            if (state !== MachineStatus.NONE) {
+                this.status[i] = state;
+            }
+        });
         this.serialPort = new serialport_1.SerialPort({ path: path, baudRate: br });
         let parser = this.serialPort.pipe(new parser_readline_1.ReadlineParser({ delimiter: '\n' }));
         this.serialPort.on("open", () => {
             console.log("opened");
         });
+        this.forcedStates = [...forcedStates];
         let self = this;
         parser.on("data", data => {
             self.onData(data);
@@ -90,7 +98,7 @@ class Machines {
         this.history.push(values);
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i];
-            if (currentStatus === MachineStatus.BROKEN)
+            if (currentStatus === MachineStatus.BROKEN || this.forcedStates[i] != MachineStatus.NONE)
                 continue;
             const historyValues = [];
             const shortValues = [];
