@@ -28,8 +28,9 @@ export class Machines {
     private readonly history: Array<Array<number>> = [];
     private readonly lastTransition: Array<number> = [];
     private readonly forcedStates: Array<MachineStatus> = [];
+    private readonly mapping: Array<number>;
 
-    public constructor(public readonly name: string, public readonly count: number, path: string, br: number, forcedStates: Array<MachineStatus>) {
+    public constructor(public readonly name: string, public readonly count: number, path: string, br: number, forcedStates: Array<MachineStatus>, mapping: Array<number>) {
         this.status = Array(count).fill(MachineStatus.NOIDEA);
         this.lastTransition = Array(count).fill(Date.now());
         forcedStates.forEach((state, i) => {
@@ -37,6 +38,7 @@ export class Machines {
                 this.status[i] = state;
             }
         });
+        this.mapping = [...mapping];
         this.serialPort = new SerialPort({ path: path, baudRate: br });
         let parser = this.serialPort.pipe(new ReadlineParser({ delimiter: '\n' }));
         this.serialPort.on("open", () => {
@@ -50,16 +52,20 @@ export class Machines {
     }
 
     public getStatus(): Array<MachineStatus> {
-        return [...this.status];
+        return this.status.map((_, i) => this.status[i]!);
     }
 
     public getStatusString(): string {
-        return this.status.map(status => machineStatusToString(status)).join(" ");
+        return this.getStatus().map(status => machineStatusToString(status)).join(" ");
+    }
+
+    public getLastTransition(): Array<number> {
+        return this.lastTransition.map((_, i) => this.lastTransition[i]!);
     }
 
     public sinceTransition(): Array<number> {
         const timeNow = Date.now();
-        return this.lastTransition.map(value => Math.floor((timeNow - value) / 1000));
+        return this.getLastTransition().map(value => Math.floor((timeNow - value) / 1000));
     }
 
     public toJSON(): Object {
@@ -71,7 +77,7 @@ export class Machines {
             status: this.getStatus().map(status => machineStatusToString(status)),
             buffer: this.buffer,
             sinceTransition: this.sinceTransition(),
-            lastTransition: [...this.lastTransition]
+            lastTransition: this.getLastTransition()
         }
     }
 

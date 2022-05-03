@@ -7,9 +7,10 @@ const express_1 = __importDefault(require("express"));
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const Machines_1 = require("./Machines");
 const path_1 = __importDefault(require("path"));
+const ForcedStates_1 = require("./ForcedStates");
 const app = (0, express_1.default)();
-const washers = new Machines_1.Machines('Washers', 3, '/dev/ttyUSB1', 9600, [Machines_1.MachineStatus.NONE, Machines_1.MachineStatus.NOIDEA, Machines_1.MachineStatus.NONE]);
-const dryers = new Machines_1.Machines('Dryers', 4, '/dev/ttyUSB0', 9600, [Machines_1.MachineStatus.NONE, Machines_1.MachineStatus.NONE, Machines_1.MachineStatus.NONE, Machines_1.MachineStatus.NONE]);
+const washers = new Machines_1.Machines('Washers', 3, '/dev/ttyUSB1', 9600, ForcedStates_1.forcedWashers, ForcedStates_1.washersMapping);
+const dryers = new Machines_1.Machines('Dryers', 4, '/dev/ttyUSB0', 9600, ForcedStates_1.forcedDryers, ForcedStates_1.dryersMapping);
 app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../dist/LaundryElement.js'));
 });

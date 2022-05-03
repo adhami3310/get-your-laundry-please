@@ -33,7 +33,7 @@ function machineStatusToString(status) {
     return "UNKNOWN";
 }
 class Machines {
-    constructor(name, count, path, br, forcedStates) {
+    constructor(name, count, path, br, forcedStates, mapping) {
         this.name = name;
         this.count = count;
         this.buffer = "";
@@ -47,6 +47,7 @@ class Machines {
                 this.status[i] = state;
             }
         });
+        this.mapping = [...mapping];
         this.serialPort = new serialport_1.SerialPort({ path: path, baudRate: br });
         let parser = this.serialPort.pipe(new parser_readline_1.ReadlineParser({ delimiter: '\n' }));
         this.serialPort.on("open", () => {
@@ -59,14 +60,17 @@ class Machines {
         });
     }
     getStatus() {
-        return [...this.status];
+        return this.status.map((_, i) => this.status[i]);
     }
     getStatusString() {
-        return this.status.map(status => machineStatusToString(status)).join(" ");
+        return this.getStatus().map(status => machineStatusToString(status)).join(" ");
+    }
+    getLastTransition() {
+        return this.lastTransition.map((_, i) => this.lastTransition[i]);
     }
     sinceTransition() {
         const timeNow = Date.now();
-        return this.lastTransition.map(value => Math.floor((timeNow - value) / 1000));
+        return this.getLastTransition().map(value => Math.floor((timeNow - value) / 1000));
     }
     toJSON() {
         return {
@@ -77,7 +81,7 @@ class Machines {
             status: this.getStatus().map(status => machineStatusToString(status)),
             buffer: this.buffer,
             sinceTransition: this.sinceTransition(),
-            lastTransition: [...this.lastTransition]
+            lastTransition: this.getLastTransition()
         };
     }
     toString() {

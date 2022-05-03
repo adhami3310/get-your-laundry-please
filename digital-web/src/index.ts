@@ -4,10 +4,11 @@ import { Server } from 'http';
 import HttpStatus from 'http-status-codes';
 import { Machines, MachineStatus } from './Machines';
 import path from 'path';
+import { dryersMapping, forcedDryers, forcedWashers, washersMapping } from './ForcedStates';
 
 const app = express();
-const washers = new Machines('Washers', 3, '/dev/ttyUSB1', 9600, [MachineStatus.NONE, MachineStatus.NOIDEA, MachineStatus.NONE]);
-const dryers = new Machines('Dryers', 4, '/dev/ttyUSB0', 9600, [MachineStatus.NONE, MachineStatus.NONE, MachineStatus.NONE, MachineStatus.NONE]);
+const washers = new Machines('Washers', 3, '/dev/ttyUSB1', 9600, forcedWashers,washersMapping);
+const dryers = new Machines('Dryers', 4, '/dev/ttyUSB0', 9600, forcedDryers, dryersMapping);
 
 app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path.join(__dirname, '../dist/LaundryElement.js'));

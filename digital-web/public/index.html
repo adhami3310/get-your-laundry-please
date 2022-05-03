@@ -62,6 +62,10 @@
         laundry-element {
             font-size: min(1.6vw, 1.2vh);
         }
+
+        .loading {
+            visibility: hidden;
+        }
     </style>
     <script>
         function updateMachines() {
@@ -74,29 +78,31 @@
                     for (let i = 1; i <= dryers.count; i++) {
                         document.getElementById(`dryer${i}`).state = dryers.status[i - 1];
                         document.getElementById(`dryer${i}`).transition = dryers.lastTransition[i - 1];
+                        document.getElementById(`dryer${i}`).classList.remove("loading");
                     }
                     for (let i = 1; i <= washers.count; i++) {
                         document.getElementById(`washer${i}`).state = washers.status[i - 1];
                         document.getElementById(`washer${i}`).transition = washers.lastTransition[i - 1];
+                        document.getElementById(`dryer${i}`).classList.remove("loading");
                     }
                 }
             )
         }
         updateMachines();
-        setInterval(updateMachines, 10000);
+        setInterval(updateMachines, 5000);
     </script>
 </head>
 
 <body>
     <div id="container">
 
-        <laundry-element id="washer1" state="on"></laundry-element>
-        <laundry-element id="washer2" state="unknown"></laundry-element>
-        <laundry-element id="washer3" state="off"></laundry-element>
-        <laundry-element id="dryer1" state="off"></laundry-element>
-        <laundry-element id="dryer2" state="broken"></laundry-element>
-        <laundry-element id="dryer3" state="on"></laundry-element>
-        <laundry-element id="dryer4" state="off"></laundry-element>
+        <laundry-element id="washer1" state="unknown" class="loading"></laundry-element>
+        <laundry-element id="washer2" state="unknown" class="loading"></laundry-element>
+        <laundry-element id="washer3" state="unknown" class="loading"></laundry-element>
+        <laundry-element id="dryer1" state="unknown" class="loading"></laundry-element>
+        <laundry-element id="dryer2" state="unknown" class="loading"></laundry-element>
+        <laundry-element id="dryer3" state="unknown" class="loading"></laundry-element>
+        <laundry-element id="dryer4" state="unknown" class="loading"></laundry-element>
         <div id="text">
             Lorem ipsum dolor, sit amet consectetur adipisicing elit. Totam iure numquam similique obcaecati, impedit ad
             pariatur. Amet porro minima eum ipsum magni unde ipsam, corporis temporibus sequi, mollitia perferendis
