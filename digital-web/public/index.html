@@ -63,6 +63,21 @@
             font-size: min(1.6vw, 1.2vh);
         }
     </style>
+    <script>
+        function updateMachines() {
+            fetch('watch').then(
+                response => response.json()
+            ).then(
+                json => {
+                    const dryers = json["dryers"];
+                    const washers = json["washers"];
+                    console.log(dryers);
+                    console.log(washers);
+                }
+            )
+        }
+        setInterval(updateMachines, 10000);
+    </script>
 </head>
 
 <body>
