@@ -73,9 +73,11 @@
                     const washers = json["washers"];
                     for (let i = 1; i <= dryers.count; i++) {
                         document.getElementById(`dryer${i}`).state = dryers.status[i - 1];
+                        document.getElementById(`dryer${i}`).transition = dryers.lastTransition[i - 1];
                     }
                     for (let i = 1; i <= washers.count; i++) {
                         document.getElementById(`washer${i}`).state = washers.status[i - 1];
+                        document.getElementById(`washer${i}`).transition = washers.lastTransition[i - 1];
                     }
                 }
             )
