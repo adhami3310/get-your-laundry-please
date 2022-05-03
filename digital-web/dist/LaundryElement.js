@@ -254,8 +254,7 @@ class LaundryElement extends HTMLElement {
         return this.lastTransition;
     }
     set transition(v) {
-        v = v.toUpperCase();
-        this.lastTransition = v;
+        this.lastTransition = v.toString();
         this.setAttribute("transition", v);
     }
     static get observedAttributes() {
@@ -282,7 +281,7 @@ class LaundryElement extends HTMLElement {
             }
         }
         if (name === "transition") {
-            this.lastTransition = newValue;
+            this.lastTransition = newValue.toString();
         }
         this.render();
     }
