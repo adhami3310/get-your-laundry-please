@@ -60,13 +60,13 @@ class Machines {
         });
     }
     getStatus() {
-        return this.status.map((_, i) => this.status[i]);
+        return this.status.map((_, i) => this.status[this.mapping[i]]);
     }
     getStatusString() {
         return this.getStatus().map(status => machineStatusToString(status)).join(" ");
     }
     getLastTransition() {
-        return this.lastTransition.map((_, i) => this.lastTransition[i]);
+        return this.lastTransition.map((_, i) => this.lastTransition[this.mapping[i]]);
     }
     sinceTransition() {
         const timeNow = Date.now();

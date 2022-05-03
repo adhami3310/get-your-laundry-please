@@ -52,7 +52,7 @@ export class Machines {
     }
 
     public getStatus(): Array<MachineStatus> {
-        return this.status.map((_, i) => this.status[i]!);
+        return this.status.map((_, i) => this.status[this.mapping[i]!]!);
     }
 
     public getStatusString(): string {
@@ -60,7 +60,7 @@ export class Machines {
     }
 
     public getLastTransition(): Array<number> {
-        return this.lastTransition.map((_, i) => this.lastTransition[i]!);
+        return this.lastTransition.map((_, i) => this.lastTransition[this.mapping[i]!]!);
     }
 
     public sinceTransition(): Array<number> {
