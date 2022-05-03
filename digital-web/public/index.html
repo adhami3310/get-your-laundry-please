@@ -83,7 +83,7 @@
                     for (let i = 1; i <= washers.count; i++) {
                         document.getElementById(`washer${i}`).state = washers.status[i - 1];
                         document.getElementById(`washer${i}`).transition = washers.lastTransition[i - 1];
-                        document.getElementById(`dryer${i}`).classList.remove("loading");
+                        document.getElementById(`washer${i}`).classList.remove("loading");
                     }
                 }
             )
