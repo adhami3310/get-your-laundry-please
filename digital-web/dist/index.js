@@ -13,6 +13,9 @@ const dryers = new Machines_1.Machines('Dryers', 4, '/dev/ttyUSB0', 9600);
 app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../dist/LaundryElement.js'));
 });
+app.use('/dist/LaundryElement.js.map', (request, response) => {
+    response.sendFile(path_1.default.join(__dirname, '../dist/LaundryElement.js.map'));
+});
 app.use('/watch', (request, response) => {
     response.status(http_status_codes_1.default.ACCEPTED).type("json").send({ "washers": washers.toJSON(), "dryers": dryers.toJSON() });
     // response.status(HttpStatus.ACCEPTED).type("text").send(`${washers.toString()}\n${dryers.toString()}\n`);
