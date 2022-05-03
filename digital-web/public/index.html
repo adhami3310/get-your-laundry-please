@@ -71,8 +71,12 @@
                 json => {
                     const dryers = json["dryers"];
                     const washers = json["washers"];
-                    console.log(dryers);
-                    console.log(washers);
+                    for (let i = 1; i <= dryers.count; i++) {
+                        document.getElementById(`dryer${i}`).state = dryers.status[i - 1];
+                    }
+                    for (let i = 1; i <= washers.count; i++) {
+                        document.getElementById(`washer${i}`).state = washers.status[i - 1];
+                    }
                 }
             )
         }
