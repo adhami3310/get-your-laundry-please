@@ -9,10 +9,10 @@
     <title>Laundry Server</title>
     <style>
         body {
-            background: rgb(0, 161, 205);
+            background: rgb(68, 172, 251);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: calc(3*min(1.6vw, 1.2vh));
-            margin: 0.2em;
+            font-size: calc(3*min(1.85vw, 1.22vh));
+            margin: 0.7em 0.2em;
         }
 
         #washer1 {
@@ -45,6 +45,13 @@
 
         #text {
             grid-area: text;
+            font-size: 0.7em;
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        }
+
+        h1 {
+            margin: 0.2em 0;
+            text-align: center;
         }
 
         #container {
@@ -60,7 +67,17 @@
         }
 
         laundry-element {
-            font-size: min(1.6vw, 1.2vh);
+            font-size: min(1.85vw, 1.22vh);
+        }
+
+        a {
+            color: rgb(115, 48, 0);
+            font-weight: bold;
+        }
+
+        .project-name {
+            font-weight: bold;
+            font-family: monospace;
         }
 
         .loading {
@@ -96,17 +113,31 @@
 <body>
     <div id="container">
 
-        <laundry-element id="washer1" state="unknown" class="loading"></laundry-element>
+        <!-- <laundry-element id="washer1" state="unknown" class="loading"></laundry-element>
         <laundry-element id="washer2" state="unknown" class="loading"></laundry-element>
         <laundry-element id="washer3" state="unknown" class="loading"></laundry-element>
         <laundry-element id="dryer1" state="unknown" class="loading"></laundry-element>
         <laundry-element id="dryer2" state="unknown" class="loading"></laundry-element>
         <laundry-element id="dryer3" state="unknown" class="loading"></laundry-element>
-        <laundry-element id="dryer4" state="unknown" class="loading"></laundry-element>
+        <laundry-element id="dryer4" state="unknown" class="loading"></laundry-element> -->
+        <laundry-element id="washer1" state="unknown"></laundry-element>
+        <laundry-element id="washer2" state="broken"></laundry-element>
+        <laundry-element id="washer3" state="on"></laundry-element>
+        <laundry-element id="dryer1" state="off"></laundry-element>
+        <laundry-element id="dryer2" state="on"></laundry-element>
+        <laundry-element id="dryer3" state="off"></laundry-element>
+        <laundry-element id="dryer4" state="unknown"></laundry-element>
         <div id="text">
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Totam iure numquam similique obcaecati, impedit ad
-            pariatur. Amet porro minima eum ipsum magni unde ipsam, corporis temporibus sequi, mollitia perferendis
-            veniam.
+            <h1>Random Hall's Laundry Server</h1>
+            <p>
+                This is brought to you by Ben Bitdiddle and the Laundry Kings. If something is not working, please email
+                us both at: <a href="mailto:random-computer-chair@mit.edu">@random-computer-chair</a> and <a
+                    href="mailto:random-laundry-empress@mit.edu">@random-laundry-empress</a>.
+            </p>
+            <p>This project is nicknamed <span class="project-name">get-your-laundry-please</span> is licensed under the
+                MIT license and is open source. The code is available <a
+                    href="https://github.com/adhami3310/get-your-laundry-please" target="_blank">on github</a>.</p>
+            <p>TechCash sucks.
         </div>
     </div>
 </body>

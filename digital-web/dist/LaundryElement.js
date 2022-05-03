@@ -21,12 +21,12 @@ const styles = `
 
 .laundry-body {
     width: 12em;
-    --vibrate-speed: 800ms;
+    --vibrate-speed: 400ms;
     --vibrate-distance: 0.1em;
 }
 
 .on .laundry-body {
-    animation: vibrate infinite var(--vibrate-speed) linear;
+    animation: bouncing infinite var(--vibrate-speed) linear;
 }
 
 .controls {
@@ -69,6 +69,24 @@ const styles = `
     border-top-left-radius: 0.5em;
     border-top-right-radius: 0.5em;
     width: 2em;
+}
+
+@keyframes bouncing {
+    from {
+        transform: scale(1, 1) translate(0, 0);
+    }
+    25% {
+        transform: scale(1, 1.03) translate(0, -1.5%);
+    }
+    50% {
+        transform: scale(1, 1) translate(0, 0);
+    }
+    75% {
+        transform: scale(1.03, 1) translate(0, 0);
+    }
+    to {
+        transform: scale(1, 1) translate(0, 0);
+    }
 }
 
 @keyframes vibrate {
@@ -131,15 +149,15 @@ const styles = `
         transform: translate(0, 0);
     }
 }
-.on .tub {
+.off .tub {
     background: yellowgreen;
 }
 
-.off .tub {
+.on .tub {
     background: #7b0000;
 }
 
-.off .text{
+.on .text{
     color: white;
 }
 
@@ -301,11 +319,11 @@ class LaundryElement extends HTMLElement {
         const since = this.shadowRoot?.querySelector(".since");
         if (swatch !== undefined && swatch !== null && since !== undefined && since !== null) {
             if (this.state === "OFF") {
-                swatch.innerHTML = `${this.machineState}`;
+                swatch.innerHTML = `FREE`;
                 since.innerHTML = `since ${LaundryElement.getSince(this.lastTransition)}m`;
             }
             else if (this.state === "ON") {
-                swatch.innerHTML = `${this.machineState}`;
+                swatch.innerHTML = `ON`;
                 since.innerHTML = `since ${LaundryElement.getSince(this.lastTransition)}m`;
             }
             else if (this.state === "UNKNOWN") {
