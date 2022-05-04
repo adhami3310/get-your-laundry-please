@@ -60,7 +60,6 @@ class Machines {
         });
     }
     getStatus() {
-        console.log(this.mapping, this.status);
         return this.status.map((_, i) => this.status[this.mapping[i]]);
     }
     getStatusString() {
