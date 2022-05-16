@@ -86,16 +86,21 @@ export class Machines {
     }
 
     private onData(data: any): void {
+        console.log(data);
         this.buffer += data + "\n";
         const lines = this.buffer.split("\n");
         if (lines.length === 1) return; //return until a full line has been received
         const firstLine = lines[0];
-        assert(firstLine !== undefined);
+        if (firstLine === undefined) return;
         this.buffer = lines.slice(1).join("\n");
         const values = firstLine.split(" ").map(val => parseFloat(val));
         if (values.length != this.count) return;
         console.log(`${this.name}: ${firstLine}`);
         this.history.push(values);
+        this.updateStatus();
+    }
+
+    private updateStatus(): void {
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i]!;
             if (currentStatus === MachineStatus.BROKEN || this.forcedStates[i] != MachineStatus.NONE) continue;
