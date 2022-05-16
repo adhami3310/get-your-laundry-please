@@ -88,7 +88,7 @@ export class Machines {
     private onData(data: string): void {
         const receivedTime = Date.now();
         for(const line of data.split("\n")){
-            const values = line.split(" ").map(val => parseFloat(val));
+            const values = line.split(" ").filter(value => value.length !== 0).map(val => parseFloat(val));
             if(values.length === 0) continue;
             console.log(`${this.name}: [${values.join(", ")}]`);
             assert.strictEqual(values.length, this.count, "Expected number of values to match number of machines, check wiring.");
