@@ -95,26 +95,30 @@ class Machines {
                 continue;
             console.log(`${this.name}: [${values.join(", ")}]`);
             assert_1.default.strictEqual(values.length, this.count, "Expected number of values to match number of machines, check wiring.");
-            this.history.push(values);
+            this.history.push({ values: values, time: receivedTime });
             this.updateStatus();
         }
     }
     updateStatus() {
+        const currentTime = Date.now();
+        let firstData = undefined;
+        while ((firstData = this.history[0]) !== undefined && currentTime - firstData.time > HISTORY_TIME) {
+            this.history.shift();
+        }
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i];
             if (currentStatus === MachineStatus.BROKEN || this.forcedStates[i] != MachineStatus.NONE)
                 continue;
             const historyValues = [];
             const shortValues = [];
-            for (let j = Math.max(0, Math.floor(this.history.length - HISTORY_TIME / DELAY)); j < this.history.length; j++) {
-                const value = this.history[j][i];
-                if (value !== undefined && value != NaN && value <= LUDICROUS_CURRENT)
+            for (const record of this.history) {
+                const value = record.values[i];
+                if (value !== undefined && value != NaN && value <= LUDICROUS_CURRENT) {
                     historyValues.push(value);
-            }
-            for (let j = Math.max(0, Math.floor(this.history.length - SHORT_TIME / DELAY)); j < this.history.length; j++) {
-                const value = this.history[j][i];
-                if (value !== undefined && value != NaN && value <= LUDICROUS_CURRENT)
-                    shortValues.push(value);
+                    if (currentTime - record.time <= SHORT_TIME) {
+                        shortValues.push(value);
+                    }
+                }
             }
             if (historyValues.length == 0 || shortValues.length == 0) {
                 this.changeStatus(i, MachineStatus.NOIDEA);
