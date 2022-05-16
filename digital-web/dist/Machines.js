@@ -90,9 +90,9 @@ class Machines {
     onData(data) {
         const receivedTime = Date.now();
         for (const line of data.split("\n")) {
+            console.log(`${this.name}: ${line}`);
             const values = line.split(" ").map(val => parseFloat(val));
             assert_1.default.strictEqual(values.length, this.count, "Expected number of values to match number of machines, check wiring.");
-            console.log(`${this.name}: ${line}`);
             this.history.push(values);
             this.updateStatus();
         }
