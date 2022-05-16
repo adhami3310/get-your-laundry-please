@@ -105,6 +105,7 @@ class Machines {
         while ((firstData = this.history[0]) !== undefined && currentTime - firstData.time > HISTORY_TIME) {
             this.history.shift();
         }
+        console.log(this.history.length);
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i];
             if (currentStatus === MachineStatus.BROKEN || this.forcedStates[i] != MachineStatus.NONE)
