@@ -34,7 +34,6 @@ class Machines {
     constructor(name, count, path, br, forcedStates, mapping) {
         this.name = name;
         this.count = count;
-        this.buffer = "";
         this.history = [];
         this.lastTransition = [];
         this.forcedStates = [];
@@ -68,7 +67,7 @@ class Machines {
     }
     sinceTransition() {
         const timeNow = Date.now();
-        return this.getLastTransition().map(value => Math.floor((timeNow - value) / 1000));
+        return this.getLastTransition().map(value => Math.floor(timeNow - value));
     }
     toJSON() {
         return {
@@ -77,7 +76,6 @@ class Machines {
             path: this.serialPort.path,
             baudRate: this.serialPort.baudRate,
             status: this.getStatus().map(status => machineStatusToString(status)),
-            buffer: this.buffer,
             sinceTransition: this.sinceTransition(),
             lastTransition: this.getLastTransition()
         };
@@ -99,10 +97,7 @@ class Machines {
     }
     updateStatus() {
         const currentTime = Date.now();
-        let firstData = undefined;
-        while ((firstData = this.history[0]) !== undefined && currentTime - firstData.time > HISTORY_TIME) {
-            this.history.shift();
-        }
+        this.history = this.history.filter(record => (currentTime - record.time <= HISTORY_TIME));
         console.log(this.history.length);
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i];

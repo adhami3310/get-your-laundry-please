@@ -26,9 +26,8 @@ function machineStatusToString(status: MachineStatus): string {
 
 export class Machines {
     private readonly serialPort: SerialPort;
-    private buffer: string = "";
     private readonly status: Array<MachineStatus>;
-    private readonly history: Array<Record> = [];
+    private history: Array<Record> = [];
     private readonly lastTransition: Array<number> = [];
     private readonly forcedStates: Array<MachineStatus> = [];
     private readonly mapping: Array<number>;
@@ -68,7 +67,7 @@ export class Machines {
 
     public sinceTransition(): Array<number> {
         const timeNow = Date.now();
-        return this.getLastTransition().map(value => Math.floor((timeNow - value) / 1000));
+        return this.getLastTransition().map(value => Math.floor(timeNow - value));
     }
 
     public toJSON(): Object {
@@ -78,7 +77,6 @@ export class Machines {
             path: this.serialPort.path,
             baudRate: this.serialPort.baudRate,
             status: this.getStatus().map(status => machineStatusToString(status)),
-            buffer: this.buffer,
             sinceTransition: this.sinceTransition(),
             lastTransition: this.getLastTransition()
         }
@@ -102,10 +100,7 @@ export class Machines {
 
     private updateStatus(): void {
         const currentTime = Date.now();
-        let firstData: Record | undefined = undefined;
-        while((firstData = this.history[0]) !== undefined && currentTime - firstData.time > HISTORY_TIME){
-            this.history.shift();
-        }
+        this.history = this.history.filter(record => (currentTime - record.time <= HISTORY_TIME));
         console.log(this.history.length);
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i]!;
