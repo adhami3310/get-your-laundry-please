@@ -85,19 +85,15 @@ export class Machines {
         return `${this.name}: ${this.getStatus()}`;
     }
 
-    private onData(data: any): void {
-        console.log(data);
-        this.buffer += data + "\n";
-        const lines = this.buffer.split("\n");
-        if (lines.length === 1) return; //return until a full line has been received
-        const firstLine = lines[0];
-        if (firstLine === undefined) return;
-        this.buffer = lines.slice(1).join("\n");
-        const values = firstLine.split(" ").map(val => parseFloat(val));
-        if (values.length != this.count) return;
-        console.log(`${this.name}: ${firstLine}`);
-        this.history.push(values);
-        this.updateStatus();
+    private onData(data: string): void {
+        const receivedTime = Date.now();
+        for(const line of data.split("\n")){
+            const values = line.split(" ").map(val => parseFloat(val));
+            assert.strictEqual(values.length, this.count, "Expected number of values to match number of machines, check wiring.");
+            console.log(`${this.name}: ${line}`);
+            this.history.push(values);
+            this.updateStatus();
+        }
     }
 
     private updateStatus(): void {

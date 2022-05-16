@@ -1,8 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Machines = exports.MachineStatus = void 0;
 const serialport_1 = require("serialport");
 const parser_readline_1 = require("@serialport/parser-readline");
+const assert_1 = __importDefault(require("assert"));
 const HISTORY_TIME = 60; //number of seonds to use to change data from ON to OFF
 const SHORT_TIME = 30; //number of seonds to use to change data from OFF to ON
 const DELAY = 3.5; // number of seconds between two incoming inputs from the arduino
@@ -84,21 +88,14 @@ class Machines {
         return `${this.name}: ${this.getStatus()}`;
     }
     onData(data) {
-        console.log(data);
-        this.buffer += data + "\n";
-        const lines = this.buffer.split("\n");
-        if (lines.length === 1)
-            return; //return until a full line has been received
-        const firstLine = lines[0];
-        if (firstLine === undefined)
-            return;
-        this.buffer = lines.slice(1).join("\n");
-        const values = firstLine.split(" ").map(val => parseFloat(val));
-        if (values.length != this.count)
-            return;
-        console.log(`${this.name}: ${firstLine}`);
-        this.history.push(values);
-        this.updateStatus();
+        const receivedTime = Date.now();
+        for (const line of data.split("\n")) {
+            const values = line.split(" ").map(val => parseFloat(val));
+            assert_1.default.strictEqual(values.length, this.count, "Expected number of values to match number of machines, check wiring.");
+            console.log(`${this.name}: ${line}`);
+            this.history.push(values);
+            this.updateStatus();
+        }
     }
     updateStatus() {
         for (let i = 0; i < this.status.length; i++) {
