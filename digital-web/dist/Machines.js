@@ -90,7 +90,7 @@ class Machines {
     onData(data) {
         const receivedTime = Date.now();
         for (const line of data.split("\n")) {
-            const values = line.split(" ").map(val => parseFloat(val)).filter(value => value != NaN);
+            const values = line.split(" ").map(val => parseFloat(val)).filter(value => !Number.isNaN(value));
             if (values.length === 0)
                 continue;
             console.log(`${this.name}: [${values.join(", ")}]`);
