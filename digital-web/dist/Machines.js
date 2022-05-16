@@ -7,13 +7,11 @@ exports.Machines = exports.MachineStatus = void 0;
 const serialport_1 = require("serialport");
 const parser_readline_1 = require("@serialport/parser-readline");
 const assert_1 = __importDefault(require("assert"));
-const HISTORY_TIME = 60; //number of seonds to use to change data from ON to OFF
-const SHORT_TIME = 30; //number of seonds to use to change data from OFF to ON
-const DELAY = 3.5; // number of seconds between two incoming inputs from the arduino
+const HISTORY_TIME = 60000; //number of milliseconds to use to change data from ON to OFF
+const SHORT_TIME = 30000; //number of milliseconds to use to change data from OFF to ON
 const LUDICROUS_CURRENT = 40; // above this the machine is acting weird and prob sth happened wrong
 const ON_THRESHOLD = 1; //the threshold to become ON
-const OFF_THRESHOLD = 1; //the threshold to become OFF
-const SIGNFIFICANT_RATIO = 1 / 2; //the minimum threshold of data present in the last time
+const OFF_THRESHOLD = 0.7; //the threshold to become OFF
 var MachineStatus;
 (function (MachineStatus) {
     MachineStatus[MachineStatus["ON"] = 0] = "ON";
@@ -129,20 +127,20 @@ class Machines {
             const shortAverage = shortValues.reduce((a, b) => a + b, 0) / shortValues.length;
             console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)} and ${Math.floor(historyAverage * 100)}`);
             if (currentStatus === MachineStatus.NOIDEA) {
-                if (shortAverage >= ON_THRESHOLD && shortValues.length * DELAY >= SIGNFIFICANT_RATIO * SHORT_TIME) {
+                if (shortAverage >= ON_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.ON);
                 }
-                else if (historyAverage <= OFF_THRESHOLD && historyValues.length * DELAY >= SIGNFIFICANT_RATIO * HISTORY_TIME) {
+                else if (historyAverage <= OFF_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.OFF);
                 }
             }
             else if (currentStatus === MachineStatus.OFF) {
-                if (shortAverage >= ON_THRESHOLD && shortValues.length * DELAY >= SIGNFIFICANT_RATIO * SHORT_TIME) {
+                if (shortAverage >= ON_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.ON);
                 }
             }
             else if (currentStatus === MachineStatus.ON) {
-                if (shortAverage <= OFF_THRESHOLD && historyAverage <= OFF_THRESHOLD && historyValues.length * DELAY >= SIGNFIFICANT_RATIO * HISTORY_TIME) {
+                if (shortAverage <= OFF_THRESHOLD && historyAverage <= OFF_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.OFF);
                 }
             }
