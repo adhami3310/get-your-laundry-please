@@ -104,17 +104,15 @@ export class Machines {
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i]!;
             if (currentStatus === MachineStatus.BROKEN || this.forcedStates[i] != MachineStatus.NONE) continue;
-            const historyValues = [];
-            const shortValues = [];
-            for (const record of this.history) {
-                const value = record.values[i];
-                if (value !== undefined && value != NaN && value <= LUDICROUS_CURRENT){
-                    historyValues.push(value);
-                    if(currentTime-record.time <= SHORT_TIME) {
-                        shortValues.push(value);
-                    }
-                }
-            }
+            const historyValues = this.history
+                .map(record => record.values[i])
+                .map(value => value ?? NaN)
+                .filter(value => !Number.isNaN(value) && value <= LUDICROUS_CURRENT);
+            const shortValues = this.history
+                .filter(record => currentTime-record.time <= SHORT_TIME)
+                .map(record => record.values[i])
+                .map(value => value ?? NaN)
+                .filter(value => !Number.isNaN(value) && value <= LUDICROUS_CURRENT);
             if (historyValues.length == 0 || shortValues.length == 0) {
                 this.changeStatus(i, MachineStatus.NOIDEA);
                 continue;
