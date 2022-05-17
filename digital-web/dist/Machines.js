@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Machines = exports.MachineStatus = void 0;
 const serialport_1 = require("serialport");
 const parser_readline_1 = require("@serialport/parser-readline");
+const _1 = require(".");
 const HISTORY_TIME = 60000; //number of milliseconds to use to change data from ON to OFF
 const SHORT_TIME = 30000; //number of milliseconds to use to change data from OFF to ON
 const LUDICROUS_CURRENT = 40; // above this the machine is acting weird and prob sth happened wrong
@@ -27,12 +28,18 @@ function machineStatusToString(status) {
     return "UNKNOWN";
 }
 class Machines {
+    name;
+    count;
+    serialPort;
+    status;
+    history = [];
+    lastTransition = [];
+    forcedStates = [];
+    mapping;
+    waiting = [];
     constructor(name, count, path, br, forcedStates, mapping) {
         this.name = name;
         this.count = count;
-        this.history = [];
-        this.lastTransition = [];
-        this.forcedStates = [];
         this.status = Array(count).fill(MachineStatus.NOIDEA);
         this.lastTransition = Array(count).fill(Date.now());
         forcedStates.forEach((state, i) => {
@@ -137,7 +144,31 @@ class Machines {
             }
         }
     }
+    addWaiting(person) {
+        if (person.waiting === "specific") {
+            if (this.waiting.filter(otherPerson => otherPerson.email === person.email)
+                .filter(otherPerson => otherPerson.waiting === "any" || otherPerson.machine === person.machine)
+                .length > 0)
+                return;
+            this.waiting.push({ email: person.email, waiting: "specific", machine: person.machine });
+        }
+        else {
+            this.waiting = this.waiting.filter(otherPerson => otherPerson.email !== person.email);
+            this.waiting.push({ email: person.email, waiting: "any" });
+        }
+    }
     changeStatus(index, newStatus) {
+        const outsideIndex = this.mapping.indexOf(index);
+        if (newStatus === MachineStatus.OFF) {
+            const people = this.waiting.filter(person => person.waiting === "any" || person.machine === outsideIndex);
+            this.waiting = this.waiting.filter(person => person.waiting === "specific" && person.machine !== outsideIndex);
+            people.forEach(person => {
+                if (person.waiting === "any")
+                    (0, _1.sendNotification)({ to: person.email, subject: `a ${this.name}` });
+                else
+                    (0, _1.sendNotification)({ to: person.email, subject: `${this.name} #${outsideIndex}` });
+            });
+        }
         this.status[index] = newStatus;
         this.lastTransition[index] = Date.now();
     }

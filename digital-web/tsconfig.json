@@ -10,9 +10,8 @@
         "noImplicitOverride": true,
         "noPropertyAccessFromIndexSignature": true,
         "noUncheckedIndexedAccess": true,
-
-        "target": "ES2021",
-        "module": "CommonJS",
+        "target": "ES2022",
+        "module": "commonjs",
         "esModuleInterop": true,
         "sourceMap": true,
         "outDir": "dist"

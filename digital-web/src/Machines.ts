@@ -1,6 +1,7 @@
 import { SerialPort } from 'serialport';
 import { ReadlineParser } from '@serialport/parser-readline';
 import assert from 'assert';
+import { sendNotification } from '.';
 
 const HISTORY_TIME = 60000; //number of milliseconds to use to change data from ON to OFF
 const SHORT_TIME = 30000; //number of milliseconds to use to change data from OFF to ON
@@ -24,6 +25,12 @@ function machineStatusToString(status: MachineStatus): string {
     return "UNKNOWN";
 }
 
+export type Person = {
+    email: string,
+    waiting: "any" | "specific",
+    machine?: number
+}
+
 export class Machines {
     private readonly serialPort: SerialPort;
     private readonly status: Array<MachineStatus>;
@@ -31,6 +38,7 @@ export class Machines {
     private readonly lastTransition: Array<number> = [];
     private readonly forcedStates: Array<MachineStatus> = [];
     private readonly mapping: Array<number>;
+    private waiting: Array<Person> = [];
 
     public constructor(public readonly name: string, public readonly count: number, path: string, br: number, forcedStates: Array<MachineStatus>, mapping: Array<number>) {
         this.status = Array(count).fill(MachineStatus.NOIDEA);
@@ -88,15 +96,15 @@ export class Machines {
 
     private onData(data: string): void {
         const receivedTime = Date.now();
-        for(const line of data.split("\n")){
+        for (const line of data.split("\n")) {
             const values = line.split(" ").map(val => parseFloat(val)).filter(value => !Number.isNaN(value));
-            if(values.length === 0) continue;
+            if (values.length === 0) continue;
             console.log(`${this.name}: [${values.join(", ")}]`);
-            if(values.length !== this.count) {
+            if (values.length !== this.count) {
                 console.log("Expected number of values to match number of machines, check wiring.");
                 return;
             }
-            this.history.push({values: values, time: receivedTime});
+            this.history.push({ values: values, time: receivedTime });
             this.updateStatus();
         }
     }
@@ -112,7 +120,7 @@ export class Machines {
                 .map(value => value !== undefined ? value : NaN)
                 .filter(value => !Number.isNaN(value) && value <= LUDICROUS_CURRENT);
             const shortValues = this.history
-                .filter(record => currentTime-record.time <= SHORT_TIME)
+                .filter(record => currentTime - record.time <= SHORT_TIME)
                 .map(record => record.values[i])
                 .map(value => value !== undefined ? value : NaN)
                 .filter(value => !Number.isNaN(value) && value <= LUDICROUS_CURRENT);
@@ -141,7 +149,28 @@ export class Machines {
         }
     }
 
+    public addWaiting(person: Person): void {
+        if (person.waiting === "specific") {
+            if (this.waiting.filter(otherPerson => otherPerson.email === person.email)
+                .filter(otherPerson => otherPerson.waiting === "any" || otherPerson.machine === person.machine)
+                .length > 0) return;
+            this.waiting.push({ email: person.email, waiting: "specific", machine: person.machine });
+        } else {
+            this.waiting = this.waiting.filter(otherPerson => otherPerson.email !== person.email);
+            this.waiting.push({ email: person.email, waiting: "any" });
+        }
+    }
+
     private changeStatus(index: number, newStatus: MachineStatus): void {
+        const outsideIndex = this.mapping.indexOf(index);
+        if (newStatus === MachineStatus.OFF) {
+            const people = this.waiting.filter(person => person.waiting === "any" || person.machine === outsideIndex);
+            this.waiting = this.waiting.filter(person => person.waiting === "specific" && person.machine !== outsideIndex);
+            people.forEach(person => {
+                if (person.waiting === "any") sendNotification({ to: person.email, subject: `a ${this.name}` });
+                else sendNotification({ to: person.email, subject: `${this.name} #${outsideIndex}` });
+            });
+        }
         this.status[index] = newStatus;
         this.lastTransition[index] = Date.now();
     }

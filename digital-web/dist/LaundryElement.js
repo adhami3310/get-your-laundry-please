@@ -230,10 +230,10 @@ const styles = `
 
 `;
 class LaundryElement extends HTMLElement {
+    machineState = "UNKNOWN";
+    lastTransition = Date.now().toString();
     constructor() {
         super();
-        this.machineState = "UNKNOWN";
-        this.lastTransition = Date.now().toString();
         const shadowRoot = this.attachShadow({ mode: "open" });
         shadowRoot.innerHTML = `<style>${styles}</style>
         <div class="laundry-machine unknown">
