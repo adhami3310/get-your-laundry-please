@@ -1,44 +1,29 @@
 /*
-  Analog input, analog output, serial output
- 
- Reads an analog input pin, maps the result to a range from 0 to 255
- and uses the result to set the pulsewidth modulation (PWM) of an output pin.
- Also prints the results to the serial monitor.
- 
- The circuit:
- * potentiometer connected to analog pin 0.
-   Center pin of the potentiometer goes to the analog pin.
-   side pins of the potentiometer go to +5V and ground
- * LED connected from digital pin 9 to ground
- 
- created 29 Dec. 2008
- modified 9 Apr 2012
- by Tom Igoe
- 
- This example code is in the public domain.
- 
- */
+ Analog Input, Digital output.
+*/
 
-// These constants won't change.  They're used to give names
-// to the pins used:
 #include <Arduino.h>
+#include "EmonLib.h"
 
-const int analogInPin = A0;  // Analog input pin that the potentiometer is attached to
-
-int sensorValue = 0;        // value read from the pot
-int outputValue = 0;        // value output to the PWM (analog out)
+EnergyMonitor emon1, emon2, emon3, emon4;
 
 void setup() {
   // initialize serial communications at 9600 bps:
   Serial.begin(9600); 
+  emon1.current(0,60.6);
+  emon2.current(1,60.6);
+  emon3.current(2,60.6);
+//    emon4.current(3,60.6);
 }
 
 void loop() {
   // read the analog in value:
-  sensorValue = analogRead(analogInPin);
-
-  // print the results to the serial monitor:
-  Serial.print("sensor = " );
-  Serial.println(sensorValue);
+  Serial.print(emon1.calcIrms(1484*4));
+  Serial.print(" ");
+  Serial.print(emon2.calcIrms(1484*4));
+  Serial.print(" ");
+//  Serial.print(emon3.calcIrms(1484*4));
+//  Serial.print(" ");
+  Serial.println(emon3.calcIrms(1484*4));
   delay(2);
 }
