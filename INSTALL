@@ -1,14 +1,3 @@
-To get this working you'll need, among other things:
+To get this installed you must install: nodejs, npm
 
-Node.js zephyr module: https://github.com/roost-im/node-zephyr
-Zephyr host manager: https://github.com/kcr/zephyr
-systemd (use included unitfiles for automatic web server startup on boot)
-logrotate
-Other node things: 
-  express
-  nodemailer
-  q
-  serialport
-  socket.io
-  underscore
-  forever
+Arduino's must be printing the value of their pins.

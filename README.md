@@ -1,4 +1,4 @@
-get-your-fucking-laundry
+get-your-laundry-please
 ========================
 
-Laundry server to let residents know when washers and dryers are free, requires hardware-level integration
+Laundry server to let residents know when washers and dryers are free, requires hardware-level integration.
