@@ -106,12 +106,12 @@ export class Machines {
             if (currentStatus === MachineStatus.BROKEN || this.forcedStates[i] != MachineStatus.NONE) continue;
             const historyValues = this.history
                 .map(record => record.values[i])
-                .map(value => value ?? NaN)
+                .map(value => value !== undefined ? value : NaN)
                 .filter(value => !Number.isNaN(value) && value <= LUDICROUS_CURRENT);
             const shortValues = this.history
                 .filter(record => currentTime-record.time <= SHORT_TIME)
                 .map(record => record.values[i])
-                .map(value => value ?? NaN)
+                .map(value => value !== undefined ? value : NaN)
                 .filter(value => !Number.isNaN(value) && value <= LUDICROUS_CURRENT);
             if (historyValues.length == 0 || shortValues.length == 0) {
                 this.changeStatus(i, MachineStatus.NOIDEA);
