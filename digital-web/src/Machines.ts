@@ -92,7 +92,10 @@ export class Machines {
             const values = line.split(" ").map(val => parseFloat(val)).filter(value => !Number.isNaN(value));
             if(values.length === 0) continue;
             console.log(`${this.name}: [${values.join(", ")}]`);
-            assert.strictEqual(values.length, this.count, "Expected number of values to match number of machines, check wiring.");
+            if(values.length !== this.count) {
+                console.log("Expected number of values to match number of machines, check wiring.");
+                return;
+            }
             this.history.push({values: values, time: receivedTime});
             this.updateStatus();
         }

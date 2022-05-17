@@ -1,12 +1,8 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Machines = exports.MachineStatus = void 0;
 const serialport_1 = require("serialport");
 const parser_readline_1 = require("@serialport/parser-readline");
-const assert_1 = __importDefault(require("assert"));
 const HISTORY_TIME = 60000; //number of milliseconds to use to change data from ON to OFF
 const SHORT_TIME = 30000; //number of milliseconds to use to change data from OFF to ON
 const LUDICROUS_CURRENT = 40; // above this the machine is acting weird and prob sth happened wrong
@@ -90,7 +86,10 @@ class Machines {
             if (values.length === 0)
                 continue;
             console.log(`${this.name}: [${values.join(", ")}]`);
-            assert_1.default.strictEqual(values.length, this.count, "Expected number of values to match number of machines, check wiring.");
+            if (values.length !== this.count) {
+                console.log("Expected number of values to match number of machines, check wiring.");
+                return;
+            }
             this.history.push({ values: values, time: receivedTime });
             this.updateStatus();
         }
