@@ -16,7 +16,7 @@ const styles = `
 }
 
 .broken .laundry-body {
-    filter: brightness(0.2);
+    filter: brightness(0.4);
 }
 
 .laundry-body {
@@ -195,7 +195,7 @@ const styles = `
 }
 
 .washing {
-    background: #eee;
+    background: #a2e3ff;
     border-bottom-left-radius: 0.5em;
     border-bottom-right-radius: 0.5em;
     height: 12em;
