@@ -9,20 +9,19 @@ const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const Machines_1 = require("./Machines");
 const path_1 = __importDefault(require("path"));
 const ForcedStates_1 = require("./ForcedStates");
-const nodemailer_1 = __importDefault(require("nodemailer"));
 const app = (0, express_1.default)();
 const washers = new Machines_1.Machines('washer', 3, '/dev/ttyUSB1', 9600, ForcedStates_1.forcedWashers, ForcedStates_1.washersMapping);
 const dryers = new Machines_1.Machines('dryer', 4, '/dev/ttyUSB0', 9600, ForcedStates_1.forcedDryers, ForcedStates_1.dryersMapping);
-const transporter = nodemailer_1.default.createTransport({
-    host: "outgoing.mit.edu",
-    port: 465,
-    secure: true,
-    auth: {
-        user: "adhami",
-        pass: "",
-    },
-    logger: true
-});
+// const transporter = nodemailer.createTransport({
+//     host: "outgoing.mit.edu",
+//     port: 465,
+//     secure: true,
+//     auth: {
+//         user: "adhami",
+//         pass: "",
+//     },
+//     logger: true
+// });
 app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../dist/LaundryElement.js'));
 });
@@ -59,11 +58,7 @@ app.listen(80, () => {
     console.log("listening");
 });
 async function sendNotification(options) {
-    transporter.sendMail({
-        from: '"Ben Bitdiddle" <random-computer-chair@mit.edu>',
-        to: options.to,
-        subject: `${options.subject} is ready eom`
-    });
+    console.log("cannot send notification");
 }
 exports.sendNotification = sendNotification;
 //# sourceMappingURL=index.js.map

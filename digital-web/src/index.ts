@@ -12,16 +12,16 @@ import { Person } from './Machines';
 const app = express();
 const washers = new Machines('washer', 3, '/dev/ttyUSB1', 9600, forcedWashers, washersMapping);
 const dryers = new Machines('dryer', 4, '/dev/ttyUSB0', 9600, forcedDryers, dryersMapping);
-const transporter = nodemailer.createTransport({
-    host: "outgoing.mit.edu",
-    port: 465,
-    secure: true,
-    auth: {
-        user: "adhami",
-        pass: "",
-    },
-    logger: true
-});
+// const transporter = nodemailer.createTransport({
+//     host: "outgoing.mit.edu",
+//     port: 465,
+//     secure: true,
+//     auth: {
+//         user: "adhami",
+//         pass: "",
+//     },
+//     logger: true
+// });
 
 app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path.join(__dirname, '../dist/LaundryElement.js'));
@@ -64,9 +64,5 @@ app.listen(80, () => {
 
 
 export async function sendNotification(options: { to: string, subject: string }): Promise<void> {
-    transporter.sendMail({
-        from: '"Ben Bitdiddle" <random-computer-chair@mit.edu>',
-        to: options.to,
-        subject: `${options.subject} is ready eom`
-    });
+    console.log("cannot send notification")
 }
