@@ -145,7 +145,7 @@ export class Machines {
                     this.changeStatus(i, MachineStatus.OFF);
                 }
             }
-            console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(historyAverage * 100)}, ${Math.floor(shortValues[shortValues.length-1]! * 100)}`);
+            console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(historyAverage * 100)}, ${Math.floor(shortValues[shortValues.length-1]! * 100)}, ${machineStatusToString(this.status[i]!)}`);
         }
     }
 
