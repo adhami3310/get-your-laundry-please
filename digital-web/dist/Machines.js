@@ -92,7 +92,7 @@ class Machines {
             const values = line.split(" ").map(val => parseFloat(val)).filter(value => !Number.isNaN(value));
             if (values.length === 0)
                 continue;
-            console.log(`${this.name}: [${values.join(", ")}]`);
+            //console.log(`${this.name}: [${values.join(", ")}]`);
             if (values.length !== this.count) {
                 console.log("Expected number of values to match number of machines, check wiring.");
                 return;
@@ -123,7 +123,6 @@ class Machines {
             }
             const historyAverage = historyValues.reduce((a, b) => a + b, 0) / historyValues.length;
             const shortAverage = shortValues.reduce((a, b) => a + b, 0) / shortValues.length;
-            console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)} and ${Math.floor(historyAverage * 100)}`);
             if (currentStatus === MachineStatus.NOIDEA) {
                 if (shortAverage >= ON_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.ON);
@@ -142,6 +141,7 @@ class Machines {
                     this.changeStatus(i, MachineStatus.OFF);
                 }
             }
+            console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(historyAverage * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}`);
         }
     }
     addWaiting(person) {
