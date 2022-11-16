@@ -1,6 +1,6 @@
 import { MachineStatus } from "./Machines";
 
-export const forcedDryers = [MachineStatus.NONE, MachineStatus.NONE, MachineStatus.NONE, MachineStatus.NONE];
+export const forcedDryers = [MachineStatus.NONE, MachineStatus.BROKEN, MachineStatus.NONE, MachineStatus.NONE];
 export const dryersMapping = [2, 1, 3, 0];
 
 export const forcedWashers = [MachineStatus.NONE, MachineStatus.NONE, MachineStatus.NONE];
