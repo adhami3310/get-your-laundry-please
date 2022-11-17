@@ -41,12 +41,12 @@ const styles = `
 }
 
 .unknown .laundry-body {
-    opacity: 0.4;
+    opacity: 0.8;
     filter: grayscale(1);
 }
 
 .broken .laundry-body {
-    opacity: 0.4;
+    opacity: 0.8;
     filter: brightness(0.4);
 }
 
