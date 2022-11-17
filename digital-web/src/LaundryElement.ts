@@ -395,16 +395,22 @@ class LaundryElement extends HTMLElement {
         return Math.floor((Date.now() - Number.parseInt(last)) / (60 * 1000));
     }
 
+    private static timeDisplay(time: number): string {
+        if (time < 60) return `${time}m`;
+        if (time < 60*24) return `${Math.floor(time/60)}h`;
+        return `${Math.floor(time/(60*24))}d`;
+    }
+
     private render(): void {
         const swatch = this.shadowRoot?.querySelector("#swatch");
         const since = this.shadowRoot?.querySelector(".since");
         if (swatch !== undefined && swatch !== null && since !== undefined && since !== null) {
             if (this.state === "OFF") {
                 swatch.innerHTML = `FREE`;
-                since.innerHTML = `since ${LaundryElement.getSince(this.lastTransition)}m`;
+                since.innerHTML = `since ${LaundryElement.timeDisplay(LaundryElement.getSince(this.lastTransition))}`;
             } else if (this.state === "ON") {
                 swatch.innerHTML = `ON`;
-                since.innerHTML = `since ${LaundryElement.getSince(this.lastTransition)}m`;
+                since.innerHTML = `since ${LaundryElement.timeDisplay(LaundryElement.getSince(this.lastTransition))}`;
             } else if (this.state === "UNKNOWN") {
                 swatch.innerHTML = `<span class="material-symbols-outlined">question_mark</span>`;
                 since.innerHTML = "";
