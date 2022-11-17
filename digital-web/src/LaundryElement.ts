@@ -2,6 +2,17 @@ const states = new Set(["OFF", "ON", "UNKNOWN", "BROKEN"]);
 const subStates = new Set(["ON", "UNKNOWN", "BROKEN"]);
 
 const styles = `
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
+
+.material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 48;
+    font-size: 2em;
+}
+
 :host {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     display: inline-block;
@@ -12,27 +23,30 @@ const styles = `
     cursor: pointer;
 }
 
-:where(.on,.unknown,.broken).laundry-machine:hover .laundry-body {
-    outline: 3px solid pink;
+:where(.on,.unknown,.broken).laundry-machine:hover {
+    outline: 3px solid #EE6485;
 }
 
-:where(.on,.unknown,.broken).laundry-machine:active .laundry-body {
+:where(.on,.unknown,.broken).laundry-machine:active {
     outline: 3px solid red;
 }
 
-:where(.on,.unknown,.broken).laundry-machine.active .laundry-body {
+:where(.on,.unknown,.broken).laundry-machine.active {
     outline: 3px solid red;
 }
 
 .laundry-machine {
     height: 15em;
+    border-radius: 0.5em;
 }
 
 .unknown .laundry-body {
+    opacity: 0.4;
     filter: grayscale(1);
 }
 
 .broken .laundry-body {
+    opacity: 0.4;
     filter: brightness(0.4);
 }
 
@@ -43,12 +57,12 @@ const styles = `
     --vibrate-distance: 0.1em;
 }
 
-.on .laundry-body {
+:not(.active).on .laundry-body {
     animation: bouncing infinite var(--vibrate-speed) linear;
 }
 
 .controls {
-    background: #546376;
+    background: var(--secondary);
     border-top-left-radius: 0.5em;
     border-top-right-radius: 0.5em;
     align-items: center;
@@ -59,13 +73,13 @@ const styles = `
 
 .knob {
     border-radius: 100%;
-    background: white;
+    background: var(--on-primary);
     height: 1.4em;
     width: 1.4em;
 }
 
 .screen {
-    border: white solid 0.2em;
+    border: var(--on-primary) solid 0.2em;
     background: grey;
     height: 1.2em;
     width: 2.2em;
@@ -167,30 +181,33 @@ const styles = `
         transform: translate(0, 0);
     }
 }
+
 .off .tub {
-    background: yellowgreen;
+    background: #4BB543;
 }
 
 .on .tub {
-    background: #7b0000;
+    background: var(--error);
 }
 
 .on .text{
-    color: white;
+    color: var(--on-error);
 }
 
 .broken .text{
     color: white;
     top: -100%;
-    margin-top: 64%;
+    margin-top: 57%;
     font-size: 0.8em;
     line-height: 3em;
 }
 
 .unknown .text{
+    color: white;
     top: -100%;
-    margin-top: 62%;
+    margin-top: 57%;
     line-height: 3em;
+    font-size: 0.8em;
 }
 
 .broken .tub {
@@ -202,7 +219,7 @@ const styles = `
 }
 
 .tub {
-    border: 0.8em solid grey;
+    border: 0.8em solid var(--on-primary);
     border-radius: 100%;
     height: 9em;
     width: 9em;
@@ -213,7 +230,7 @@ const styles = `
 }
 
 .washing {
-    background: #a2e3ff;
+    background: var(--primary);
     border-bottom-left-radius: 0.5em;
     border-bottom-right-radius: 0.5em;
     height: 12em;
@@ -244,6 +261,16 @@ const styles = `
 
 .on .text {
     animation: antivibrate infinite var(--vibrate-speed) linear;
+}
+
+@media (prefers-color-scheme: dark) {
+    .off .tub {
+        background: #4BB543;
+    }
+
+    .off .text {
+        color: white;
+    }
 }
 
 `;
@@ -373,10 +400,10 @@ class LaundryElement extends HTMLElement {
                 swatch.innerHTML = `ON`;
                 since.innerHTML = `since ${LaundryElement.getSince(this.lastTransition)}m`;
             } else if (this.state === "UNKNOWN") {
-                swatch.innerHTML = "?";
+                swatch.innerHTML = `<span class="material-symbols-outlined">question_mark</span>`;
                 since.innerHTML = "";
             } else {
-                swatch.innerHTML = "broken";
+                swatch.innerHTML = `<span class="material-symbols-outlined">heart_broken</span>`;
                 since.innerHTML = "";
             }
         }

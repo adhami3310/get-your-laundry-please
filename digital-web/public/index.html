@@ -44,10 +44,19 @@
             --on-surface-variant-focus-dark: #CAC4D01F;
             --primary-light: #6750A4;
             --primary-dark: #D0BCFF;
+            --secondary-light: #625B71;
+            --secondary-dark: #CCC2DC;
+            --secondary: var(--secondary-light);
+            --error-light: #B3261E;
+            --error-dark: #F2B8B5;
+            --on-error-light: #FFFFFF;
+            --on-error-dark: #601410;
             --on-primary-light: #FFFFFF;
             --on-primary-dark: #371E73;
             --outline-light: #79747E;
             --outline-dark: #938F99;
+            --on-error: var(--on-error-light);
+            --error: var(--error-light);
             --on-surface-variant: var(--on-surface-variant-light);
             --on-surface-variant-hover: var(--on-surface-variant-hover-light);
             --on-surface-variant-focus: var(--on-surface-variant-focus-light);
@@ -62,6 +71,25 @@
             color: var(--on-background);
         }
 
+
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                --on-error: var(--on-error-dark);
+                --error: var(--error-dark);
+                --secondary: var(--secondary-dark);
+                --on-surface-variant: var(--on-surface-variant-dark);
+                --on-surface-variant-hover: var(--on-surface-variant-hover-dark);
+                --on-surface-variant-focus: var(--on-surface-variant-focus-dark);
+                --outline: var(--outline-dark);
+                --primary: var(--primary-dark);
+                --on-primary: var(--on-primary-dark);
+                --background: var(--background-dark);
+                --on-background: var(--on-background-dark);
+                --surface: var(--surface-dark);
+                --on-surface: var(--on-surface-dark);
+            }
+        }
 
         @media only screen and (max-width: 100vh) {
             body {
@@ -125,7 +153,7 @@
         }
 
         a {
-            color: rgb(115, 48, 0);
+            color: var(--primary);
             font-weight: bold;
         }
 
@@ -135,7 +163,7 @@
         }
 
         fieldset {
-            border-width: 1px;
+            border-width: 2px;
             border-color: var(--outline);
             border-radius: 4px;
         }
@@ -149,6 +177,7 @@
             font-family: inherit;
             appearance: none;
             border: 2px solid var(--on-surface-variant);
+            background: var(--surface);
             color: var(--on-surface);
             border-radius: 4px;
             padding: 0.2em;
@@ -306,7 +335,6 @@
 
 <body>
     <div id="container">
-
         <laundry-element id="washer1" state="unknown" class="loading"></laundry-element>
         <laundry-element id="washer2" state="unknown" class="loading"></laundry-element>
         <laundry-element id="washer3" state="unknown" class="loading"></laundry-element>
