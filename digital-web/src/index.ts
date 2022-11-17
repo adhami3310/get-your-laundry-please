@@ -47,38 +47,37 @@ app.use('/watch', (request, response) => {
 
 app.post('/notify', (request, response) => {
     console.log(request.body);
-    // const { email, machines } = request.body;
-    // assert(email !== undefined && machines !== undefined);
-    // machines.forEach(req: {machine: String, index: String } => {
-    //     const {machine, index} = req;
-    //     if (machine !== "washer" && machine !== "dryer") {
-    //         response.status(HttpStatus.BAD_REQUEST).type('text').send('expected dryer/washer');
-    //         return;
-    //     }
-    //     const relevantMachine = (machine === "washer" ? washers : dryers);
-    //     const machineIndex = Number.parseInt(index);
-    //     if (machineIndex < 0 || machineIndex >= relevantMachine.count) {
-    //         response.status(HttpStatus.BAD_REQUEST).type('text').send('wrong index');
-    //     }
-    // });
-    // const washersRequests: Array<Number> = [];
-    // const dryersRequests: Array<number> = [];
-    // machines.forEach(machine => {
-    //     const machineIndex = Number.parseInt(index);
-    //     if (machine === "washer") {
-    //         washersRequests.push(machineIndex);
-    //     } else {
-    //         dryersRequests.push(machineIndex);
-    //     }
-    // });
-    // if (washersRequests.length > 0) {
-    //     washers.addWaiting({email: email, machiens: washersRequests});
-    // }
-    // if (dryersRequests.length > 0) {
-    //     dryers.addWaiting({email: email, machiens: dryersRequests});
-    // }
-    // relevantMachine.addWaiting({ email: email, machine: Number.parseInt(index) });
-    // response.status(HttpStatus.ACCEPTED).type('text').send('works just fine');
+    const { email, machines } = request.body;
+    assert(email !== undefined && machines !== undefined && email.type === "string" && Array.isArray(machines));
+
+    machines.forEach(req => {
+        const {machine, index} = req;
+        if (machine !== "washer" && machine !== "dryer") {
+            response.status(HttpStatus.BAD_REQUEST).type('text').send('expected dryer/washer');
+            return;
+        }
+        const relevantMachine = (machine === "washer" ? washers : dryers);
+        if (index < 0 || index >= relevantMachine.count) {
+            response.status(HttpStatus.BAD_REQUEST).type('text').send('wrong index');
+        }
+    });
+    const washersRequests: Array<number> = [];
+    const dryersRequests: Array<number> = [];
+    machines.forEach(req => {
+        const {machine, index} = req;
+        if (machine === "washer") {
+            washersRequests.push(index);
+        } else {
+            dryersRequests.push(index);
+        }
+    });
+    if (washersRequests.length > 0) {
+        washers.addWaiting({email: email, machines: washersRequests});
+    }
+    if (dryersRequests.length > 0) {
+        dryers.addWaiting({email: email, machines: dryersRequests});
+    }
+    response.status(HttpStatus.ACCEPTED).type('text').send('works just fine');
 });
 
 app.get('/', (request, response) => {

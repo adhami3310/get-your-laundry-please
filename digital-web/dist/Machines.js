@@ -145,16 +145,14 @@ class Machines {
         }
     }
     addWaiting(person) {
-        if (this.waiting.filter(otherPerson => otherPerson.email === person.email && otherPerson.machine === person.machine).length > 0)
-            return;
-        this.waiting.push({ email: person.email, machine: person.machine });
+        this.waiting.push({ email: person.email, machines: person.machines });
     }
     changeStatus(index, newStatus) {
         const outsideIndex = this.mapping.indexOf(index);
         if (newStatus === MachineStatus.OFF) {
             console.log(this.waiting);
-            const people = this.waiting.filter(person => person.machine === outsideIndex);
-            this.waiting = this.waiting.filter(person => person.machine !== outsideIndex);
+            const people = this.waiting.filter(person => person.machines.find((x) => x === outsideIndex) != undefined);
+            this.waiting = this.waiting.filter(person => !person.machines.find((x) => x === outsideIndex) != undefined);
             people.forEach(person => {
                 (0, _1.sendNotification)({ to: person.email, subject: `${this.name} #${outsideIndex + 1} is ready` });
             });

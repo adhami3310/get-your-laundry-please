@@ -27,7 +27,7 @@ function machineStatusToString(status: MachineStatus): string {
 
 export type Person = {
     email: string,
-    machine?: number
+    machines: Array<number>
 }
 
 export class Machines {
@@ -149,16 +149,15 @@ export class Machines {
     }
 
     public addWaiting(person: Person): void {
-        if (this.waiting.filter(otherPerson => otherPerson.email === person.email && otherPerson.machine === person.machine).length > 0) return;
-        this.waiting.push({ email: person.email, machine: person.machine });
+        this.waiting.push({ email: person.email, machines: person.machines });
     }
 
     private changeStatus(index: number, newStatus: MachineStatus): void {
         const outsideIndex = this.mapping.indexOf(index);
         if (newStatus === MachineStatus.OFF) {
             console.log(this.waiting);
-            const people = this.waiting.filter(person => person.machine === outsideIndex);
-            this.waiting = this.waiting.filter(person => person.machine !== outsideIndex);
+            const people = this.waiting.filter(person => person.machines.find((x) => x === outsideIndex) != undefined);
+            this.waiting = this.waiting.filter(person => !person.machines.find((x) => x === outsideIndex) != undefined);
             people.forEach(person => {
                 sendNotification({ to: person.email, subject: `${this.name} #${outsideIndex+1} is ready` });
             });
