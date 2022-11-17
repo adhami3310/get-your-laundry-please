@@ -15,7 +15,7 @@
           'wght' 400,
           'GRAD' 0,
           'opsz' 48;
-          padding: 4px;
+          padding: 0 4px;
           height: 1em;
           font-size: 1.5em;
         }
@@ -33,6 +33,10 @@
             --on-background-dark: #E6E1E5;
             --surface-light: #FFFBFE;
             --surface-dark: #1C1B1F;
+            --inverse-surface-light: #313033;
+            --inverse-surface-dark: #E6E1E5;
+            --on-inverse-surface-light: #F4EFF4;
+            --on-inverse-surface-dark: #313033;
             --on-surface-light: #1C1B1F;
             --on-surface-dark: #E6E1E5;
             --on-surface-light: #1C1B1F;
@@ -46,7 +50,6 @@
             --primary-dark: #D0BCFF;
             --secondary-light: #625B71;
             --secondary-dark: #CCC2DC;
-            --secondary: var(--secondary-light);
             --error-light: #B3261E;
             --error-dark: #F2B8B5;
             --on-error-light: #FFFFFF;
@@ -55,6 +58,9 @@
             --on-primary-dark: #371E73;
             --outline-light: #79747E;
             --outline-dark: #938F99;
+            --inverse-surface: var(--inverse-surface-light);
+            --on-inverse-surface: var(--on-inverse-surface-light);
+            --secondary: var(--secondary-light);
             --on-error: var(--on-error-light);
             --error: var(--error-light);
             --on-surface-variant: var(--on-surface-variant-light);
@@ -75,6 +81,8 @@
 
         @media (prefers-color-scheme: dark) {
             body {
+                --inverse-surface: var(--inverse-surface-dark);
+                --on-inverse-surface: var(--on-inverse-surface-dark);
                 --on-error: var(--on-error-dark);
                 --error: var(--error-dark);
                 --secondary: var(--secondary-dark);
@@ -130,12 +138,12 @@
             font-size: 0.8em;
             padding: 0em 1em;
         }
-
+        
         h2 {
             margin: 0.5em 0;
             text-align: center;
         }
-
+        
         #container {
             display: grid;
             grid-template-areas: "empty washer1 washer2 washer3"
@@ -194,10 +202,10 @@
             border-radius: 4px;
         }
 
-        .selection {
+        .sigment-container {
             justify-content: space-evenly;
             display: flex;
-            margin: 1em 0;
+            margin: 0.5em 0;
         }
         
         .sigment:not(.active) {
@@ -279,6 +287,41 @@
             align-items: center;
         }
 
+        @keyframes increase-height {
+            from {height: 0em; padding-top: 0; padding-bottom: 0;}
+        }
+
+        @keyframes fade {
+            from {opacity: 1;}
+            to {opacity: 0;}
+        }
+
+        .snackbar {
+            display: none;
+            background: var(--inverse-surface);
+            color: var(--on-inverse-surface);
+            width: 22em;
+            padding: 0.7em 0.8em;
+            border-radius: 4px;
+            height: 1.5em;
+            position: fixed;
+            z-index: 1;
+            bottom: 0.4em;
+            left: 50%;
+            transform: translate(-50%);
+            box-shadow: 0px 0px 2px black;
+            animation: increase-height 0.5s;
+        }
+
+        .snackbar.visible {
+            display: block;
+        }
+
+        .snackbar.hiding {
+            animation: fade 0.4s;
+            opacity: 0;
+        }
+
     </style>
     <script>
         function ask(email, machines) {
@@ -293,18 +336,39 @@
 
         function notify() {
             const email = document.querySelector("input[type=email]");
-            const option = document.querySelector(".sigment.active").id;
-            if(option === "selected"){
-                ask(email.value, sub.map(machine => {
-                    const machineType = machine.substring(0, machine.length - 1);
-                    const machineIndex = Number.parseInt(machine.substring(machine.length - 1));
-                    return {machine: machineType, index: machineIndex-1};
-                }));
-            } else if (option === "dryers") {
-                ask(email.value, [{machine: "dryer", index: 0}, {machine: "dryer", index: 1}, {machine: "dryer", index: 2}, {machine: "dryer", index: 3}])
-            } else if (option === "washers") {
-                ask(email.value, [{machine: "dryer", index: 0}, {machine: "dryer", index: 1}, {machine: "dryer", index: 2}]);
-            } 
+            const option = document.querySelector(".selection .active").id;
+            const type = document.querySelector(".types .active").id;
+            if (type === "first") {
+                if(option === "selected"){
+                    ask(email.value, sub.map(machine => {
+                        const machineType = machine.substring(0, machine.length - 1);
+                        const machineIndex = Number.parseInt(machine.substring(machine.length - 1));
+                        return {machine: machineType, index: machineIndex-1};
+                    }));
+                } else if (option === "dryers") {
+                    ask(email.value, [{machine: "dryer", index: 0}, {machine: "dryer", index: 1}, {machine: "dryer", index: 2}, {machine: "dryer", index: 3}])
+                } else if (option === "washers") {
+                    ask(email.value, [{machine: "dryer", index: 0}, {machine: "dryer", index: 1}, {machine: "dryer", index: 2}]);
+                } 
+            } else {
+                if(option === "selected"){
+                    sub.forEach(machine => {
+                        const machineType = machine.substring(0, machine.length - 1);
+                        const machineIndex = Number.parseInt(machine.substring(machine.length - 1));
+                        ask(email.value, [{machine: machine, index: machineIndex}]);
+                    });
+                } else if (option === "dryers") {
+                    for (let i = 0; i < 4; i += 1) {
+                        ask(email.value, [{machine: "dryer", index: i}]);
+                    }
+                } else if (option === "washers") {
+                    for (let i = 0; i < 3; i += 1) {
+                        ask(email.value, [{machine: "washer", index: i}]);
+                    }
+                }
+            }
+            showSnackbar();
+            unselectAll();
             return true;
         }
 
@@ -352,15 +416,19 @@
         <div id="text">
             <fieldset>
                 <legend>Notifications</legend>
-                <form  name="notifications" onsubmit="return notify()">
+                <form  name="notifications">
                     <div class="email">
                         <span class="material-symbols-outlined check">mail</span>
                         <input name="email" type="email" placeholder="Email" required/>
                     </div>
-                    <div class="selection">
-                        <button type="button" class="sigment" id="selected"><span class="material-symbols-outlined check">check</span><span class="option">Selected</span></button>
-                        <button type="button" class="sigment active" id="washers"><span class="material-symbols-outlined check">check</span><span class="option">Washers</span></button>
-                        <button type="button" class="sigment" id="dryers"><span class="material-symbols-outlined check">check</span><span class="option">Dryers</span></button>
+                    <div class="selection sigment-container">
+                        <button type="button" class="sigment selected" id="selected"><span class="material-symbols-outlined check">check</span><span class="option">Selected</span></button>
+                        <button type="button" class="sigment active selected" id="washers"><span class="material-symbols-outlined check">check</span><span class="option">Washers</span></button>
+                        <button type="button" class="sigment selected" id="dryers"><span class="material-symbols-outlined check">check</span><span class="option">Dryers</span></button>
+                    </div>
+                    <div class="types sigment-container">
+                        <button type="button" class="sigment active type" id="first"><span class="material-symbols-outlined check">check</span><span class="option">First</span></button>
+                        <button type="button" class="sigment type" id="ind"><span class="material-symbols-outlined check">check</span><span class="option">Individual</span></button>
                     </div>
                     <button id="send_notify" class="main" type="submit"><span class="material-symbols-outlined">notifications</span>Notify</button>
                 </form>
@@ -376,26 +444,78 @@
                     href="https://github.com/adhami3310/get-your-laundry-please" target="_blank">on github</a>.</p>
             <p>Washlava sucks.</p>
         </div>
+        <div class="snackbar">
+            You will be notified.
+        </div>
     </div>
     <script>
+        function showSnackbar() {
+            document.querySelector(".snackbar").classList.add("visible");
+            setTimeout(() => {
+                hideSnackbar();
+            }, 4000);
+        }
+
+        function hideSnackbar() {
+            document.querySelector(".snackbar").classList.add("hiding");
+            setTimeout(()=> {
+                document.querySelector(".snackbar").classList.remove("visible");
+                document.querySelector(".snackbar").classList.remove("hiding");
+            }, 500);
+        }
+
+        function unselectDryers() {
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`dryer${i}`).turnNotifOff();
+            }
+        }
+
+        function unselectWashers() {
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`washer${i}`).turnNotifOff();
+            }
+        }
+
+        function unselectAll() {
+            unselectWashers();
+            unselectDryers();
+        }
+
         function switchToSelected() {
             const sig = document.querySelector("#selected");
             if(sig.classList.contains("active")) return;
-            document.querySelectorAll(".sigment").forEach(other => {
+            document.querySelectorAll(".selected").forEach(other => {
                 other.classList.remove("active");
             });
             sig.classList.add("active");
         }
 
-        document.querySelectorAll(".sigment").forEach((element) => {
+        document.querySelectorAll(".selected").forEach((element) => {
             element.addEventListener("click", (ev) => {
                 const sig = ev.currentTarget;
                 if(sig.classList.contains("active")) return;
-                document.querySelectorAll(".sigment").forEach(other => {
+                document.querySelectorAll(".selected").forEach(other => {
+                    other.classList.remove("active");
+                });
+                unselectAll();
+                sig.classList.add("active");
+            });
+        });
+
+        document.querySelectorAll(".type").forEach((element) => {
+            element.addEventListener("click", (ev) => {
+                const sig = ev.currentTarget;
+                if(sig.classList.contains("active")) return;
+                document.querySelectorAll(".type").forEach(other => {
                     other.classList.remove("active");
                 });
                 sig.classList.add("active");
             });
+        });
+
+        document.querySelector("form[name=notifications]").addEventListener("submit", ev => {
+            ev.preventDefault();
+            notify();
         });
 
         let sub = [];
@@ -405,8 +525,9 @@
                     sub = sub.filter((m) => m != `dryer${i}`);                
                 } else {
                     sub.push(`dryer${i}`);
+                    unselectWashers();
+                    switchToSelected();
                 }
-                switchToSelected();
             });
         }
         for (let i = 1; i <= 3; i++) {
@@ -415,8 +536,9 @@
                     sub = sub.filter((m) => m != `washer${i}`);                
                 } else {
                     sub.push(`washer${i}`);
+                    unselectDryers();
+                    switchToSelected();
                 }
-                switchToSelected();
             });
         }
     </script>

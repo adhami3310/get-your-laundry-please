@@ -321,6 +321,12 @@ class LaundryElement extends HTMLElement {
         this.callbacks.push(callback);
     }
 
+    public turnNotifOff () {
+        if (this.notifState) {
+            this.notifToggle();
+        }
+    }
+
     private notifToggle() {
         this.callbacks.forEach(callback => {
             callback(this.notifState);
