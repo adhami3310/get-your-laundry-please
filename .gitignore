@@ -37,3 +37,6 @@ nosetests.xml
 *.swp
 applet
 # nope *.log
+
+#passwords
+*.env

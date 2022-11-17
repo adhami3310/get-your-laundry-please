@@ -8,6 +8,8 @@ import { dryersMapping, forcedDryers, forcedWashers, washersMapping } from './Fo
 import nodemailer from 'nodemailer';
 import Mail from "nodemailer/lib/mailer";
 import { Person } from './Machines';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 const washers = new Machines('washer', 3, '/dev/ttyUSB1', 9600, forcedWashers, washersMapping);
@@ -17,8 +19,8 @@ const transporter = nodemailer.createTransport({
     port: 465,
     secure: true,
     auth: {
-        user: "adhami",
-        pass: "",
+        user: process.env["USERNAME"],
+        pass: process.env["PASSWORD"],
     },
     logger: true
 });

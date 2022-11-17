@@ -235,7 +235,7 @@ const styles = `
 
 .washing {
     background: var(--surface-light);
-    border: 2px solid var(--on-surface);
+    border: 2px solid var(--secondary);
     border-top: none;
     border-bottom-left-radius: 0.5em;
     border-bottom-right-radius: 0.5em;
