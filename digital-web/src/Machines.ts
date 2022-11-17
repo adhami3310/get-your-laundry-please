@@ -160,7 +160,7 @@ export class Machines {
             const people = this.waiting.filter(person => person.machine === outsideIndex);
             this.waiting = this.waiting.filter(person => person.machine !== outsideIndex);
             people.forEach(person => {
-                sendNotification({ to: person.email, subject: `${this.name} #${outsideIndex} is ready` });
+                sendNotification({ to: person.email, subject: `${this.name} #${outsideIndex+1} is ready` });
             });
         }
         this.status[index] = newStatus;

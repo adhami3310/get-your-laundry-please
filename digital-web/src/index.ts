@@ -47,19 +47,38 @@ app.use('/watch', (request, response) => {
 
 app.post('/notify', (request, response) => {
     console.log(request.body);
-    const { email, machine, index } = request.body;
-    assert(email !== undefined && machine !== undefined && index !== undefined);
-    if (machine !== "washer" && machine !== "dryer") {
-        response.status(HttpStatus.BAD_REQUEST).type('text').send('expected dryer/washer');
-        return;
-    }
-    const relevantMachine = (machine === "washer" ? washers : dryers);
-    const machineIndex = Number.parseInt(index);
-    if (machineIndex < 0 || machineIndex >= relevantMachine.count) {
-        response.status(HttpStatus.BAD_REQUEST).type('text').send('wrong index');
-    }
-    relevantMachine.addWaiting({ email: email, machine: Number.parseInt(index) });
-    response.status(HttpStatus.ACCEPTED).type('text').send('works just fine');
+    // const { email, machines } = request.body;
+    // assert(email !== undefined && machines !== undefined);
+    // machines.forEach(req: {machine: String, index: String } => {
+    //     const {machine, index} = req;
+    //     if (machine !== "washer" && machine !== "dryer") {
+    //         response.status(HttpStatus.BAD_REQUEST).type('text').send('expected dryer/washer');
+    //         return;
+    //     }
+    //     const relevantMachine = (machine === "washer" ? washers : dryers);
+    //     const machineIndex = Number.parseInt(index);
+    //     if (machineIndex < 0 || machineIndex >= relevantMachine.count) {
+    //         response.status(HttpStatus.BAD_REQUEST).type('text').send('wrong index');
+    //     }
+    // });
+    // const washersRequests: Array<Number> = [];
+    // const dryersRequests: Array<number> = [];
+    // machines.forEach(machine => {
+    //     const machineIndex = Number.parseInt(index);
+    //     if (machine === "washer") {
+    //         washersRequests.push(machineIndex);
+    //     } else {
+    //         dryersRequests.push(machineIndex);
+    //     }
+    // });
+    // if (washersRequests.length > 0) {
+    //     washers.addWaiting({email: email, machiens: washersRequests});
+    // }
+    // if (dryersRequests.length > 0) {
+    //     dryers.addWaiting({email: email, machiens: dryersRequests});
+    // }
+    // relevantMachine.addWaiting({ email: email, machine: Number.parseInt(index) });
+    // response.status(HttpStatus.ACCEPTED).type('text').send('works just fine');
 });
 
 app.get('/', (request, response) => {

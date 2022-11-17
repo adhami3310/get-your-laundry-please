@@ -227,13 +227,13 @@
 
     </style>
     <script>
-        function ask(email, machine, index) {
+        function ask(email, machines) {
             fetch('/notify', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email: email, machine: machine, index: index })
+                body: JSON.stringify({ email: email, machines: machines})
             });
         }
 
@@ -241,27 +241,16 @@
             const email = document.querySelector("input[type=email]");
             const option = document.querySelector(".sigment.active").id;
             if(option === "selected"){
-                sub.forEach(machine => {
+                ask(email.value, sub.map(machine => {
                     const machineType = machine.substring(0, machine.length - 1);
                     const machineIndex = Number.parseInt(machine.substring(machine.length - 1));
-                    ask(email.value, machineType, machineIndex-1);
-                });
+                    return {machine: machineType, index: machineIndex-1};
+                }));
             } else if (option === "dryers") {
-                for(let i = 0; i < 4;  i += 1) {
-                    ask(email.value, "dryer", i);
-                }
+                ask(email.value, [{machine: "dryer", index: 0}, {machine: "dryer", index: 1}, {machine: "dryer", index: 2}, {machine: "dryer", index: 3}])
             } else if (option === "washers") {
-                for(let i = 0; i < 3;  i += 1) {
-                    ask(email.value, "washer", i);
-                }
-            } else if (option === "all") {
-                for(let i = 0; i < 4;  i += 1) {
-                    ask(email.value, "dryer", i);
-                }
-                for(let i = 0; i < 3;  i += 1) {
-                    ask(email.value, "washer", i);
-                }
-            }
+                ask(email.value, [{machine: "dryer", index: 0}, {machine: "dryer", index: 1}, {machine: "dryer", index: 2}]);
+            } 
             return true;
         }
 
@@ -319,7 +308,6 @@
                         <button type="button" class="sigment" id="selected"><span class="material-symbols-outlined check">check</span><span class="option">Selected</span></button>
                         <button type="button" class="sigment active" id="washers"><span class="material-symbols-outlined check">check</span><span class="option">Washers</span></button>
                         <button type="button" class="sigment" id="dryers"><span class="material-symbols-outlined check">check</span><span class="option">Dryers</span></button>
-                        <button type="button" class="sigment" id="all"><span class="material-symbols-outlined check">check</span><span class="option">All</span></button>
                     </div>
                     <button id="send_notify" class="main" type="submit"><span class="material-symbols-outlined">notifications</span>Notify</button>
                 </form>
