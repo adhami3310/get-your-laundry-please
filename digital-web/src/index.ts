@@ -46,14 +46,13 @@ app.use('/watch', (request, response) => {
 });
 
 app.post('/notify', (request, response) => {
-    const { email, machinesString } = request.body;
-    console.log(machinesString.toString());
-    console.log(JSON.parse(machinesString.toString()));
-    const machines = Array.from(JSON.parse(machinesString.toString()));
-    assert(email !== undefined && machines !== undefined && email.type === "string" && Array.isArray(machines));
+    const { email, machines } = request.body;
+    const machinesArray: Array<{machine: string, index: number}> = Array.from(machines);
+    console.log(machinesArray);
+    assert(email !== undefined && machines !== undefined && email.type === "string");
     console.log(email);
 
-    machines.forEach(req => {
+    machinesArray.forEach(req => {
         const {machine, index} = req;
         if (machine !== "washer" && machine !== "dryer") {
             response.status(HttpStatus.BAD_REQUEST).type('text').send('expected dryer/washer');
@@ -66,7 +65,7 @@ app.post('/notify', (request, response) => {
     });
     const washersRequests: Array<number> = [];
     const dryersRequests: Array<number> = [];
-    machines.forEach(req => {
+    machinesArray.forEach(req => {
         const {machine, index} = req;
         if (machine === "washer") {
             washersRequests.push(index);

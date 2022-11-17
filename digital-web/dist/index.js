@@ -42,13 +42,12 @@ app.use('/watch', (request, response) => {
     // response.status(HttpStatus.ACCEPTED).type("text").send(`${washers.toString()}\n${dryers.toString()}\n`);
 });
 app.post('/notify', (request, response) => {
-    const { email, machinesString } = request.body;
-    console.log(machinesString.toString());
-    console.log(JSON.parse(machinesString.toString()));
-    const machines = Array.from(JSON.parse(machinesString.toString()));
-    (0, assert_1.default)(email !== undefined && machines !== undefined && email.type === "string" && Array.isArray(machines));
+    const { email, machines } = request.body;
+    const machinesArray = Array.from(machines);
+    console.log(machinesArray);
+    (0, assert_1.default)(email !== undefined && machines !== undefined && email.type === "string");
     console.log(email);
-    machines.forEach(req => {
+    machinesArray.forEach(req => {
         const { machine, index } = req;
         if (machine !== "washer" && machine !== "dryer") {
             response.status(http_status_codes_1.default.BAD_REQUEST).type('text').send('expected dryer/washer');
@@ -61,7 +60,7 @@ app.post('/notify', (request, response) => {
     });
     const washersRequests = [];
     const dryersRequests = [];
-    machines.forEach(req => {
+    machinesArray.forEach(req => {
         const { machine, index } = req;
         if (machine === "washer") {
             washersRequests.push(index);
