@@ -159,7 +159,7 @@ export class Machines {
             const people = this.waiting.filter(person => person.machines.find((x) => x === outsideIndex) != undefined);
             this.waiting = this.waiting.filter(person => !person.machines.find((x) => x === outsideIndex) != undefined);
             people.forEach(person => {
-                sendNotification({ to: person.email, subject: `${this.name} #${outsideIndex+1} is ready` });
+                sendNotification({ to: person.email, subject: `${this.name} #${outsideIndex+1} is ready eom` });
             });
         }
         this.status[index] = newStatus;

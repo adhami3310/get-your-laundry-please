@@ -75,7 +75,7 @@ app.post('/notify', (request, response) => {
     if (dryersRequests.length > 0) {
         dryers.addWaiting({ email: email, machines: dryersRequests });
     }
-    response.status(http_status_codes_1.default.ACCEPTED).type('text').send('works just fine');
+    response.status(http_status_codes_1.default.OK).type('text').send('works just fine');
 });
 app.get('/', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../public/index.html'));
