@@ -1,10 +1,27 @@
 const states = new Set(["OFF", "ON", "UNKNOWN", "BROKEN"]);
+const subStates = new Set(["ON", "UNKNOWN", "BROKEN"]);
 
 const styles = `
 :host {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     display: inline-block;
     color: black;
+}
+
+:where(.on,.unknown,.broken).laundry-machine {
+    cursor: pointer;
+}
+
+:where(.on,.unknown,.broken).laundry-machine:hover .laundry-body {
+    outline: 3px solid pink;
+}
+
+:where(.on,.unknown,.broken).laundry-machine:active .laundry-body {
+    outline: 3px solid red;
+}
+
+:where(.on,.unknown,.broken).laundry-machine.active .laundry-body {
+    outline: 3px solid red;
 }
 
 .laundry-machine {
@@ -20,6 +37,7 @@ const styles = `
 }
 
 .laundry-body {
+    border-radius: 0.5em;
     width: 12em;
     --vibrate-speed: 400ms;
     --vibrate-distance: 0.1em;
@@ -233,6 +251,8 @@ const styles = `
 class LaundryElement extends HTMLElement {
     private machineState: string = "UNKNOWN";
     private lastTransition: string = Date.now().toString();
+    private notifState = false;
+    private callbacks: Array<(previouslyActive: boolean) => void> = [];
 
     public constructor() {
         super();
@@ -259,15 +279,33 @@ class LaundryElement extends HTMLElement {
             </div>
         </div>
         `;
+        shadowRoot.addEventListener("click", (ev) => {
+            if(subStates.has(this.machineState)) {
+                this.notifToggle();
+            }
+        });
     }
 
     public get state(): string {
         return this.machineState;
     }
 
+    public addNotificationToggle(callback: (previouslyActive: boolean) => void) {
+        this.callbacks.push(callback);
+    }
+
+    private notifToggle() {
+        this.callbacks.forEach(callback => {
+            callback(this.notifState);
+        });
+        this.notifState = !this.notifState;
+        this.shadowRoot?.querySelector(".laundry-machine")?.classList.toggle("active");
+    }
+
     public set state(v: string) {
         v = v.toUpperCase();
         if (!states.has(v)) return;
+        if(subStates.has(this.machineState) && !subStates.has(v) && this.notifState) this.notifToggle();
         this.machineState = v;
         this.setAttribute("state", v);
     }
@@ -289,6 +327,7 @@ class LaundryElement extends HTMLElement {
         if (name === "state") {
             newValue = newValue.toUpperCase();
             if (!states.has(newValue)) return;
+            if(subStates.has(this.machineState) && !subStates.has(newValue) && this.notifState) this.notifToggle();
             this.machineState = newValue;
             const shadowRoot = this.shadowRoot;
             if (shadowRoot) {

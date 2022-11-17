@@ -145,28 +145,17 @@ class Machines {
         }
     }
     addWaiting(person) {
-        if (person.waiting === "specific") {
-            if (this.waiting.filter(otherPerson => otherPerson.email === person.email)
-                .filter(otherPerson => otherPerson.waiting === "any" || otherPerson.machine === person.machine)
-                .length > 0)
-                return;
-            this.waiting.push({ email: person.email, waiting: "specific", machine: person.machine });
-        }
-        else {
-            this.waiting = this.waiting.filter(otherPerson => otherPerson.email !== person.email);
-            this.waiting.push({ email: person.email, waiting: "any" });
-        }
+        if (this.waiting.filter(otherPerson => otherPerson.email === person.email && otherPerson.machine === person.machine).length > 0)
+            return;
+        this.waiting.push({ email: person.email, machine: person.machine });
     }
     changeStatus(index, newStatus) {
         const outsideIndex = this.mapping.indexOf(index);
         if (newStatus === MachineStatus.OFF) {
-            const people = this.waiting.filter(person => person.waiting === "any" || person.machine === outsideIndex);
-            this.waiting = this.waiting.filter(person => person.waiting === "specific" && person.machine !== outsideIndex);
+            const people = this.waiting.filter(person => person.machine === outsideIndex);
+            this.waiting = this.waiting.filter(person => person.machine !== outsideIndex);
             people.forEach(person => {
-                if (person.waiting === "any")
-                    (0, _1.sendNotification)({ to: person.email, subject: `a ${this.name}` });
-                else
-                    (0, _1.sendNotification)({ to: person.email, subject: `${this.name} #${outsideIndex}` });
+                (0, _1.sendNotification)({ to: person.email, subject: `${this.name} #${outsideIndex} is ready` });
             });
         }
         this.status[index] = newStatus;
