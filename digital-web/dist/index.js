@@ -42,8 +42,9 @@ app.use('/watch', (request, response) => {
     // response.status(HttpStatus.ACCEPTED).type("text").send(`${washers.toString()}\n${dryers.toString()}\n`);
 });
 app.post('/notify', (request, response) => {
-    console.log(request.body);
     const { email, machines } = request.body;
+    console.log(machines);
+    console.log(machines.type);
     (0, assert_1.default)(email !== undefined && machines !== undefined && email.type === "string" && Array.isArray(machines));
     machines.forEach(req => {
         const { machine, index } = req;
