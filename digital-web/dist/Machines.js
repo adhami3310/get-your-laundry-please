@@ -152,6 +152,7 @@ class Machines {
     changeStatus(index, newStatus) {
         const outsideIndex = this.mapping.indexOf(index);
         if (newStatus === MachineStatus.OFF) {
+            console.log(this.waiting);
             const people = this.waiting.filter(person => person.machine === outsideIndex);
             this.waiting = this.waiting.filter(person => person.machine !== outsideIndex);
             people.forEach(person => {

@@ -156,6 +156,7 @@ export class Machines {
     private changeStatus(index: number, newStatus: MachineStatus): void {
         const outsideIndex = this.mapping.indexOf(index);
         if (newStatus === MachineStatus.OFF) {
+            console.log(this.waiting);
             const people = this.waiting.filter(person => person.machine === outsideIndex);
             this.waiting = this.waiting.filter(person => person.machine !== outsideIndex);
             people.forEach(person => {

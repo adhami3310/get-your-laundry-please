@@ -47,6 +47,7 @@ app.use('/notify/:email/:machine/:index', (request, response) => {
     if (machineIndex < 0 || machineIndex >= relevantMachine.count) {
         response.status(http_status_codes_1.default.BAD_REQUEST).type('text').send('wrong index');
     }
+    console.log(`request: ${email}, ${machine}, ${index}`);
     relevantMachine.addWaiting({ email: email, machine: Number.parseInt(index) });
     response.status(http_status_codes_1.default.ACCEPTED);
 });
@@ -54,6 +55,7 @@ app.listen(80, () => {
     console.log("listening");
 });
 async function sendNotification(options) {
+    console.log(`sending email to ${options.to}, with content "${options.subject}"`);
     transporter.sendMail({
         sender: "laundry@mit.edu",
         to: options.to,
