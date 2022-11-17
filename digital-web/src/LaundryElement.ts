@@ -1,5 +1,5 @@
 const states = new Set(["OFF", "ON", "UNKNOWN", "BROKEN"]);
-const subStates = new Set(["ON", "UNKNOWN", "BROKEN"]);
+const subStates = new Set(["ON", "UNKNOWN", "BROKEN", "OFF"]);
 
 const styles = `
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
@@ -16,23 +16,23 @@ const styles = `
 :host {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     display: inline-block;
-    color: black;
+    color: white;
 }
 
-:where(.on,.unknown,.broken).laundry-machine {
+:where(.on,.unknown,.broken,.off).laundry-machine {
     cursor: pointer;
 }
 
-:where(.on,.unknown,.broken).laundry-machine:hover {
-    outline: 3px solid #EE6485;
+:where(.on,.unknown,.broken,.off).laundry-machine:hover {
+    outline: 5px solid #EE6485;
 }
 
-:where(.on,.unknown,.broken).laundry-machine:active {
-    outline: 3px solid red;
+:where(.on,.unknown,.broken,.off).laundry-machine:active {
+    outline: 5px solid red;
 }
 
-:where(.on,.unknown,.broken).laundry-machine.active {
-    outline: 3px solid red;
+:where(.on,.unknown,.broken,.off).laundry-machine.active {
+    outline: 5px solid red;
 }
 
 .laundry-machine {
@@ -41,12 +41,10 @@ const styles = `
 }
 
 .unknown .laundry-body {
-    opacity: 0.8;
     filter: grayscale(1);
 }
 
 .broken .laundry-body {
-    opacity: 0.8;
     filter: brightness(0.4);
 }
 
@@ -182,6 +180,12 @@ const styles = `
     }
 }
 
+@media (prefers-color-scheme: dark) {
+    .on .tub {
+        border-color: var(--on-error);
+    }
+}
+
 .off .tub {
     background: #4BB543;
 }
@@ -197,7 +201,7 @@ const styles = `
 .broken .text{
     color: white;
     top: -100%;
-    margin-top: 57%;
+    margin-top: 54%;
     font-size: 0.8em;
     line-height: 3em;
 }
@@ -205,7 +209,7 @@ const styles = `
 .unknown .text{
     color: white;
     top: -100%;
-    margin-top: 57%;
+    margin-top: 54%;
     line-height: 3em;
     font-size: 0.8em;
 }
@@ -219,7 +223,7 @@ const styles = `
 }
 
 .tub {
-    border: 0.8em solid var(--on-primary);
+    border: 0.8em solid var(--on-primary-dark);
     border-radius: 100%;
     height: 9em;
     width: 9em;
@@ -230,7 +234,9 @@ const styles = `
 }
 
 .washing {
-    background: var(--primary);
+    background: var(--surface-light);
+    border: 2px solid var(--on-surface);
+    border-top: none;
     border-bottom-left-radius: 0.5em;
     border-bottom-right-radius: 0.5em;
     height: 12em;
