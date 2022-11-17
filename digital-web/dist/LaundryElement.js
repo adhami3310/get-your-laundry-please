@@ -45,7 +45,7 @@ const styles = `
 }
 
 .broken .laundry-body {
-    filter: brightness(0.4);
+    filter: grayscale(1) brightness(0.4);
 }
 
 .laundry-body {
@@ -75,6 +75,26 @@ const styles = `
     height: 1.4em;
     width: 1.4em;
 }
+
+@media (prefers-color-scheme: dark) {
+    .broken .knob {
+        background: black;
+    }
+
+    .on .knob {
+        background: var(--on-error-dark);
+    }
+    
+    .on .screen {
+        border-color: var(--on-error-dark);
+        background: var(--error-dark);
+    }
+    
+    .off .screen {
+        background: #4BB543;
+    }
+}
+
 
 .screen {
     border: var(--on-primary) solid 0.2em;
@@ -180,22 +200,33 @@ const styles = `
     }
 }
 
-@media (prefers-color-scheme: dark) {
-    .on .tub {
-        border-color: var(--on-error);
-    }
-}
-
 .off .tub {
     background: #4BB543;
 }
 
+
 .on .tub {
-    background: var(--error);
+    border-color: var(--on-error-dark);
+    background: var(--error-dark);
 }
 
 .on .text{
-    color: var(--on-error);
+    color: var(--on-error-dark);
+}
+
+@media (prefers-color-scheme: light) {
+    .off .tub {
+        border-color: var(--secondary);
+    }
+
+    .on .tub {
+        border-color: var(--secondary);
+        background: var(--error-dark);
+    }
+    
+    .on .text{
+        color: var(--on-error-dark);
+    }
 }
 
 .broken .text{
@@ -216,6 +247,7 @@ const styles = `
 
 .broken .tub {
     background: black;
+    border-color: grey;
 }
 
 .unknown .tub {
@@ -267,16 +299,6 @@ const styles = `
 
 .on .text {
     animation: antivibrate infinite var(--vibrate-speed) linear;
-}
-
-@media (prefers-color-scheme: dark) {
-    .off .tub {
-        background: #4BB543;
-    }
-
-    .off .text {
-        color: white;
-    }
 }
 
 `;
@@ -407,7 +429,7 @@ class LaundryElement extends HTMLElement {
                 since.innerHTML = `since ${LaundryElement.timeDisplay(LaundryElement.getSince(this.lastTransition))}`;
             }
             else if (this.state === "ON") {
-                swatch.innerHTML = `ON`;
+                swatch.innerHTML = `BUSY`;
                 since.innerHTML = `since ${LaundryElement.timeDisplay(LaundryElement.getSince(this.lastTransition))}`;
             }
             else if (this.state === "UNKNOWN") {
