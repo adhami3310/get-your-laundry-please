@@ -9,7 +9,7 @@ import nodemailer from 'nodemailer';
 import Mail from "nodemailer/lib/mailer";
 import { Person } from './Machines';
 import * as dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ path: __dirname+'../.env' });
 
 const app = express();
 const washers = new Machines('washer', 3, '/dev/ttyUSB1', 9600, forcedWashers, washersMapping);
