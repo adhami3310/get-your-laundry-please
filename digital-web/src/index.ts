@@ -47,8 +47,9 @@ app.use('/watch', (request, response) => {
 
 app.post('/notify', (request, response) => {
     const { email, machinesString } = request.body;
-    console.log(JSON.parse(machinesString));
-    const machines = Array.from(JSON.parse(machinesString));
+    console.log(machinesString.toString());
+    console.log(JSON.parse(machinesString.toString()));
+    const machines = Array.from(JSON.parse(machinesString.toString()));
     assert(email !== undefined && machines !== undefined && email.type === "string" && Array.isArray(machines));
     console.log(email);
 
