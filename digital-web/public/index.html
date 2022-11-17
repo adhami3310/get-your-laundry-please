@@ -228,7 +228,7 @@
     </style>
     <script>
         function ask(email, machine, index) {
-            const request = fetch('/notify', {
+            fetch('/notify', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
