@@ -227,6 +227,16 @@
 
     </style>
     <script>
+        function ask(email, machine, index) {
+            const request = fetch('/notify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email, machine: machine, index: index })
+            });
+        }
+
         function notify() {
             const email = document.querySelector("input[type=email]");
             const option = document.querySelector(".sigment.active").id;
@@ -234,22 +244,22 @@
                 sub.forEach(machine => {
                     const machineType = machine.substring(0, machine.length - 1);
                     const machineIndex = Number.parseInt(machine.substring(machine.length - 1));
-                    fetch(`notify/${email.value}/${machineType}/${machineIndex-1}`);
+                    ask(email.value, machineType, machineIndex-1);
                 });
             } else if (option === "dryers") {
                 for(let i = 0; i < 4;  i += 1) {
-                    fetch(`notify/${email.value}/dryer/${i}`);
+                    ask(email.value, "dryer", i);
                 }
             } else if (option === "washers") {
                 for(let i = 0; i < 3;  i += 1) {
-                    fetch(`notify/${email.value}/washer/${i}`);
+                    ask(email.value, "washer", i);
                 }
             } else if (option === "all") {
                 for(let i = 0; i < 4;  i += 1) {
-                    fetch(`notify/${email.value}/dryer/${i}`);
+                    ask(email.value, "dryer", i);
                 }
                 for(let i = 0; i < 3;  i += 1) {
-                    fetch(`notify/${email.value}/washer/${i}`);
+                    ask(email.value, "washer", i);
                 }
             }
             return true;

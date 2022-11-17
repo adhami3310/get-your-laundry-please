@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendNotification = void 0;
+const assert_1 = __importDefault(require("assert"));
 const express_1 = __importDefault(require("express"));
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const Machines_1 = require("./Machines");
@@ -23,6 +24,11 @@ const transporter = nodemailer_1.default.createTransport({
     },
     logger: true
 });
+app.use((request, response, next) => {
+    // allow requests from web pages hosted anywhere
+    response.set('Access-Control-Allow-Origin', '*');
+    next();
+});
 app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../dist/LaundryElement.js'));
 });
@@ -36,20 +42,29 @@ app.use('/watch', (request, response) => {
 app.use('/', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../public/index.html'));
 });
-app.use('/notify/:email/:machine/:index', (request, response) => {
-    const { email, machine, index } = request.params;
-    if (machine !== "washer" && machine !== "dryer") {
-        response.status(http_status_codes_1.default.BAD_REQUEST).type('text').send('expected dryer/washer');
-        return;
+app.post('/notify', (request, response) => {
+    try {
+        const { email, machine, index } = request.body;
+        (0, assert_1.default)(email && machine && index);
+        if (machine !== "washer" && machine !== "dryer") {
+            response.status(http_status_codes_1.default.BAD_REQUEST).type('text').send('expected dryer/washer');
+            return;
+        }
+        const relevantMachine = (machine === "washer" ? washers : dryers);
+        const machineIndex = Number.parseInt(index);
+        if (machineIndex < 0 || machineIndex >= relevantMachine.count) {
+            response.status(http_status_codes_1.default.BAD_REQUEST).type('text').send('wrong index');
+        }
+        console.log(`request: ${email}, ${machine}, ${index}`);
+        relevantMachine.addWaiting({ email: email, machine: Number.parseInt(index) });
+        response.status(http_status_codes_1.default.ACCEPTED);
     }
-    const relevantMachine = (machine === "washer" ? washers : dryers);
-    const machineIndex = Number.parseInt(index);
-    if (machineIndex < 0 || machineIndex >= relevantMachine.count) {
-        response.status(http_status_codes_1.default.BAD_REQUEST).type('text').send('wrong index');
+    catch (error) {
+        response
+            .status(http_status_codes_1.default.BAD_REQUEST)
+            .type('text')
+            .send('Config failed to parse');
     }
-    console.log(`request: ${email}, ${machine}, ${index}`);
-    relevantMachine.addWaiting({ email: email, machine: Number.parseInt(index) });
-    response.status(http_status_codes_1.default.ACCEPTED);
 });
 app.listen(80, () => {
     console.log("listening");

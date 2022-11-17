@@ -23,6 +23,12 @@ const transporter = nodemailer.createTransport({
     logger: true
 });
 
+app.use((request, response, next) => {
+    // allow requests from web pages hosted anywhere
+    response.set('Access-Control-Allow-Origin', '*');
+    next();
+});
+
 app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path.join(__dirname, '../dist/LaundryElement.js'));
 });
@@ -40,20 +46,28 @@ app.use('/', (request, response) => {
     response.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-app.use('/notify/:email/:machine/:index', (request, response) => {
-    const { email, machine, index } = request.params;
-    if (machine !== "washer" && machine !== "dryer") {
-        response.status(HttpStatus.BAD_REQUEST).type('text').send('expected dryer/washer');
-        return;
+app.post('/notify', (request, response) => {
+    try {
+        const { email, machine, index } = request.body;
+        assert(email && machine && index);
+        if (machine !== "washer" && machine !== "dryer") {
+            response.status(HttpStatus.BAD_REQUEST).type('text').send('expected dryer/washer');
+            return;
+        }
+        const relevantMachine = (machine === "washer" ? washers : dryers);
+        const machineIndex = Number.parseInt(index);
+        if (machineIndex < 0 || machineIndex >= relevantMachine.count) {
+            response.status(HttpStatus.BAD_REQUEST).type('text').send('wrong index');
+        }
+        console.log(`request: ${email}, ${machine}, ${index}`);
+        relevantMachine.addWaiting({ email: email, machine: Number.parseInt(index) });
+        response.status(HttpStatus.ACCEPTED);
+    } catch (error) {
+        response
+            .status(HttpStatus.BAD_REQUEST)
+            .type('text')
+            .send('Config failed to parse');
     }
-    const relevantMachine = (machine === "washer" ? washers : dryers);
-    const machineIndex = Number.parseInt(index);
-    if (machineIndex < 0 || machineIndex >= relevantMachine.count) {
-        response.status(HttpStatus.BAD_REQUEST).type('text').send('wrong index');
-    }
-    console.log(`request: ${email}, ${machine}, ${index}`);
-    relevantMachine.addWaiting({ email: email, machine: Number.parseInt(index) });
-    response.status(HttpStatus.ACCEPTED);
 });
 
 app.listen(80, () => {
