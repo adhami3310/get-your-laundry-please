@@ -24,6 +24,8 @@ const transporter = nodemailer_1.default.createTransport({
     },
     logger: true
 });
+app.use(express_1.default.json());
+app.use(express_1.default.urlencoded({ extended: true }));
 app.use((request, response, next) => {
     // allow requests from web pages hosted anywhere
     response.set('Access-Control-Allow-Origin', '*');
