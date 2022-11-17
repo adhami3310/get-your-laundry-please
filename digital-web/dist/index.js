@@ -45,7 +45,7 @@ app.post('/notify', (request, response) => {
     const { email, machines } = request.body;
     const machinesArray = Array.from(machines);
     console.log(machinesArray);
-    (0, assert_1.default)(email !== undefined && machines !== undefined && email.type === "string");
+    (0, assert_1.default)(email !== undefined);
     console.log(email);
     machinesArray.forEach(req => {
         const { machine, index } = req;

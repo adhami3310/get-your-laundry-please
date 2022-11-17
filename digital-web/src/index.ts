@@ -49,7 +49,7 @@ app.post('/notify', (request, response) => {
     const { email, machines } = request.body;
     const machinesArray: Array<{machine: string, index: number}> = Array.from(machines);
     console.log(machinesArray);
-    assert(email !== undefined && machines !== undefined && email.type === "string");
+    assert(email !== undefined );
     console.log(email);
 
     machinesArray.forEach(req => {
