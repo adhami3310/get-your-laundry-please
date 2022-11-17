@@ -50,31 +50,20 @@ app.use('/', (request, response) => {
 });
 
 app.post('/notify', (request, response) => {
-    try {
-        const { email, machine, index } = request.body;
-        console.log(`request: ${email}, ${machine}, ${index}`);
-        assert(email && machine && index);
-        console.log(`request: ${email}, ${machine}, ${index}`);
-        if (machine !== "washer" && machine !== "dryer") {
-            response.status(HttpStatus.BAD_REQUEST).type('text').send('expected dryer/washer');
-            return;
-        }
-        console.log(`request: ${email}, ${machine}, ${index}`);
-        const relevantMachine = (machine === "washer" ? washers : dryers);
-        const machineIndex = Number.parseInt(index);
-        console.log(`request: ${email}, ${machine}, ${index}`);
-        if (machineIndex < 0 || machineIndex >= relevantMachine.count) {
-            response.status(HttpStatus.BAD_REQUEST).type('text').send('wrong index');
-        }
-        console.log(`request: ${email}, ${machine}, ${index}`);
-        relevantMachine.addWaiting({ email: email, machine: Number.parseInt(index) });
-        response.status(HttpStatus.ACCEPTED);
-    } catch (error) {
-        response
-            .status(HttpStatus.BAD_REQUEST)
-            .type('text')
-            .send('Config failed to parse');
+    console.log(request.body);
+    const { email, machine, index } = request.body;
+    assert(email && machine && index);
+    if (machine !== "washer" && machine !== "dryer") {
+        response.status(HttpStatus.BAD_REQUEST).type('text').send('expected dryer/washer');
+        return;
     }
+    const relevantMachine = (machine === "washer" ? washers : dryers);
+    const machineIndex = Number.parseInt(index);
+    if (machineIndex < 0 || machineIndex >= relevantMachine.count) {
+        response.status(HttpStatus.BAD_REQUEST).type('text').send('wrong index');
+    }
+    relevantMachine.addWaiting({ email: email, machine: Number.parseInt(index) });
+    response.status(HttpStatus.ACCEPTED).type('text').send('works just fine');
 });
 
 app.listen(80, () => {
