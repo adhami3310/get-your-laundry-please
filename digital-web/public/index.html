@@ -21,9 +21,11 @@
         }
     </style>
     <style>
+
+
         body {
             font-family: sans-serif;
-            font-size: calc(2*min(1.85vw, 1.22vh));
+            font-size: 2.44vh;
             margin: 0.4em 0.2em;
             --background-light: #FFFBFE;
             --background-dark: #1C1B1F;
@@ -60,6 +62,13 @@
             color: var(--on-background);
         }
 
+
+        @media only screen and (max-width: 100vh) {
+            body {
+                font-size: 3.7vw;
+            }
+        }
+
         #washer1 {
             grid-area: washer1;
         }
@@ -90,7 +99,7 @@
 
         #text {
             grid-area: text;
-            font-size: 0.7em;
+            font-size: 0.8em;
             padding: 0em 1em;
         }
 
@@ -112,7 +121,7 @@
         }
 
         laundry-element {
-            font-size: min(1.85vw, 1.22vh);
+            font-size: 0.5em;
         }
 
         a {
@@ -290,28 +299,28 @@
                 }
             )
         }
-        // updateMachines();
-        // setInterval(updateMachines, 5000);
+        updateMachines();
+        setInterval(updateMachines, 5000);
     </script>
 </head>
 
 <body>
     <div id="container">
 
-        <!-- <laundry-element id="washer1" state="unknown" class="loading"></laundry-element>
+        <laundry-element id="washer1" state="unknown" class="loading"></laundry-element>
         <laundry-element id="washer2" state="unknown" class="loading"></laundry-element>
         <laundry-element id="washer3" state="unknown" class="loading"></laundry-element>
         <laundry-element id="dryer1" state="unknown" class="loading"></laundry-element>
         <laundry-element id="dryer2" state="unknown" class="loading"></laundry-element>
         <laundry-element id="dryer3" state="unknown" class="loading"></laundry-element>
-        <laundry-element id="dryer4" state="unknown" class="loading"></laundry-element> -->
-        <laundry-element id="washer1" state="unknown"></laundry-element>
+        <laundry-element id="dryer4" state="unknown" class="loading"></laundry-element>
+        <!-- <laundry-element id="washer1" state="unknown"></laundry-element>
         <laundry-element id="washer2" state="broken"></laundry-element>
         <laundry-element id="washer3" state="on"></laundry-element>
         <laundry-element id="dryer1" state="off"></laundry-element>
         <laundry-element id="dryer2" state="on"></laundry-element>
         <laundry-element id="dryer3" state="off"></laundry-element>
-        <laundry-element id="dryer4" state="unknown"></laundry-element>
+        <laundry-element id="dryer4" state="unknown"></laundry-element> -->
         <div id="text">
             <fieldset>
                 <legend>Notifications</legend>
