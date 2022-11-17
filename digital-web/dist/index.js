@@ -44,7 +44,7 @@ app.use('/watch', (request, response) => {
 app.post('/notify', (request, response) => {
     console.log(request.body);
     const { email, machine, index } = request.body;
-    (0, assert_1.default)(email && machine && index);
+    (0, assert_1.default)(email !== undefined && machine !== undefined && index !== undefined);
     if (machine !== "washer" && machine !== "dryer") {
         response.status(http_status_codes_1.default.BAD_REQUEST).type('text').send('expected dryer/washer');
         return;
