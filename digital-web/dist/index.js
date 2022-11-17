@@ -41,9 +41,6 @@ app.use('/watch', (request, response) => {
     response.status(http_status_codes_1.default.ACCEPTED).type("json").send({ "washers": washers.toJSON(), "dryers": dryers.toJSON() });
     // response.status(HttpStatus.ACCEPTED).type("text").send(`${washers.toString()}\n${dryers.toString()}\n`);
 });
-app.use('/', (request, response) => {
-    response.sendFile(path_1.default.join(__dirname, '../public/index.html'));
-});
 app.post('/notify', (request, response) => {
     console.log(request.body);
     const { email, machine, index } = request.body;
@@ -59,6 +56,9 @@ app.post('/notify', (request, response) => {
     }
     relevantMachine.addWaiting({ email: email, machine: Number.parseInt(index) });
     response.status(http_status_codes_1.default.ACCEPTED).type('text').send('works just fine');
+});
+app.get('/', (request, response) => {
+    response.sendFile(path_1.default.join(__dirname, '../public/index.html'));
 });
 app.listen(80, () => {
     console.log("listening");
