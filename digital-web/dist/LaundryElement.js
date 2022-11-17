@@ -426,11 +426,11 @@ class LaundryElement extends HTMLElement {
         if (swatch !== undefined && swatch !== null && since !== undefined && since !== null) {
             if (this.state === "OFF") {
                 swatch.innerHTML = `FREE`;
-                since.innerHTML = `since ${LaundryElement.timeDisplay(LaundryElement.getSince(this.lastTransition))}`;
+                since.innerHTML = `for ${LaundryElement.timeDisplay(LaundryElement.getSince(this.lastTransition))}`;
             }
             else if (this.state === "ON") {
                 swatch.innerHTML = `BUSY`;
-                since.innerHTML = `since ${LaundryElement.timeDisplay(LaundryElement.getSince(this.lastTransition))}`;
+                since.innerHTML = `for ${LaundryElement.timeDisplay(LaundryElement.getSince(this.lastTransition))}`;
             }
             else if (this.state === "UNKNOWN") {
                 swatch.innerHTML = `<span class="material-symbols-outlined">question_mark</span>`;
