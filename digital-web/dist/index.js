@@ -43,10 +43,11 @@ app.use('/watch', (request, response) => {
 });
 app.post('/notify', (request, response) => {
     const { email, machinesString } = request.body;
-    const machines = Array.from(machinesString);
+    console.log(JSON.stringify(machinesString));
+    console.log(JSON.parse(JSON.stringify(machinesString)));
+    const machines = Array.from(JSON.parse(JSON.stringify(machinesString)));
     (0, assert_1.default)(email !== undefined && machines !== undefined && email.type === "string" && Array.isArray(machines));
     console.log(email);
-    console.log(machines);
     machines.forEach(req => {
         const { machine, index } = req;
         if (machine !== "washer" && machine !== "dryer") {
