@@ -91,12 +91,12 @@ app.post('/notify', (request, response) => {
     response.status(HttpStatus.OK).type('text').send('works just fine');
 });
 
-app.get('/', (request, response) => {
-    response.sendFile(path.join(__dirname, '../public/index.html'));
+app.get('/favicon.png', (request, response) => {
+    response.sendFile(path.join(__dirname, '../public/favicon.png'));
 });
 
-app.get('/favicon.png', (request, response) => {
-    response.sendFile(path.join(__dirname, '../public/favicon.html'));
+app.get('/', (request, response) => {
+    response.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 app.listen(80, () => {
