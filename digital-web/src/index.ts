@@ -12,9 +12,9 @@ import { Person } from './Machines';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: __dirname+'/../.env' });
 
-let key = fs.readFileSync(__dirname + '/../selfsigned.key');
-let cert = fs.readFileSync(__dirname + '/../selfsigned.crt');
-let options = {
+const key = fs.readFileSync(__dirname + '/../cert/selfsigned.key');
+const cert = fs.readFileSync(__dirname + '/../cert/selfsigned.crt');
+const options = {
     key: key,
     cert: cert
 };
@@ -97,11 +97,11 @@ app.get('/', (request, response) => {
 });
 
 
-let server = https.createServer(options, app);
+const server = https.createServer(options, app);
 
 server.listen(80, () => {
     console.log("listening");
-})
+});
 
 
 export async function sendNotification(options: { to: string, subject: string }): Promise<void> {

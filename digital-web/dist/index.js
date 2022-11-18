@@ -38,9 +38,9 @@ const ForcedStates_1 = require("./ForcedStates");
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const dotenv = __importStar(require("dotenv"));
 dotenv.config({ path: __dirname + '/../.env' });
-let key = fs_1.default.readFileSync(__dirname + '/../selfsigned.key');
-let cert = fs_1.default.readFileSync(__dirname + '/../selfsigned.crt');
-let options = {
+const key = fs_1.default.readFileSync(__dirname + '/../cert/selfsigned.key');
+const cert = fs_1.default.readFileSync(__dirname + '/../cert/selfsigned.crt');
+const options = {
     key: key,
     cert: cert
 };
@@ -113,7 +113,7 @@ app.post('/notify', (request, response) => {
 app.get('/', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../public/index.html'));
 });
-let server = https_1.default.createServer(options, app);
+const server = https_1.default.createServer(options, app);
 server.listen(80, () => {
     console.log("listening");
 });
