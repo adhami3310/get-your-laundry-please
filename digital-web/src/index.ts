@@ -1,6 +1,7 @@
 import assert from 'assert';
 import express, { Application, request, response } from 'express';
-import { Server } from 'http';
+import https from 'https';
+import fs from 'fs';
 import HttpStatus from 'http-status-codes';
 import { Machines, MachineStatus } from './Machines';
 import path from 'path';
@@ -11,7 +12,12 @@ import { Person } from './Machines';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: __dirname+'/../.env' });
 
-console.log(process.env);
+let key = fs.readFileSync(__dirname + '/../selfsigned.key');
+let cert = fs.readFileSync(__dirname + '/../selfsigned.crt');
+let options = {
+    key: key,
+    cert: cert
+};
 
 const app = express();
 const washers = new Machines('washer', 3, '/dev/ttyUSB1', 9600, forcedWashers, washersMapping);
@@ -91,9 +97,11 @@ app.get('/', (request, response) => {
 });
 
 
-app.listen(80, () => {
+let server = https.createServer(options, app);
+
+server.listen(80, () => {
     console.log("listening");
-});
+})
 
 
 export async function sendNotification(options: { to: string, subject: string }): Promise<void> {

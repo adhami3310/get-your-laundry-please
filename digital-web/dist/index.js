@@ -29,6 +29,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendNotification = void 0;
 const assert_1 = __importDefault(require("assert"));
 const express_1 = __importDefault(require("express"));
+const https_1 = __importDefault(require("https"));
+const fs_1 = __importDefault(require("fs"));
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const Machines_1 = require("./Machines");
 const path_1 = __importDefault(require("path"));
@@ -36,7 +38,12 @@ const ForcedStates_1 = require("./ForcedStates");
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const dotenv = __importStar(require("dotenv"));
 dotenv.config({ path: __dirname + '/../.env' });
-console.log(process.env);
+let key = fs_1.default.readFileSync(__dirname + '/../selfsigned.key');
+let cert = fs_1.default.readFileSync(__dirname + '/../selfsigned.crt');
+let options = {
+    key: key,
+    cert: cert
+};
 const app = (0, express_1.default)();
 const washers = new Machines_1.Machines('washer', 3, '/dev/ttyUSB1', 9600, ForcedStates_1.forcedWashers, ForcedStates_1.washersMapping);
 const dryers = new Machines_1.Machines('dryer', 4, '/dev/ttyUSB0', 9600, ForcedStates_1.forcedDryers, ForcedStates_1.dryersMapping);
@@ -106,7 +113,8 @@ app.post('/notify', (request, response) => {
 app.get('/', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../public/index.html'));
 });
-app.listen(80, () => {
+let server = https_1.default.createServer(options, app);
+server.listen(80, () => {
     console.log("listening");
 });
 async function sendNotification(options) {
