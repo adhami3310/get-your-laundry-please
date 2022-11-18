@@ -29,8 +29,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendNotification = void 0;
 const assert_1 = __importDefault(require("assert"));
 const express_1 = __importDefault(require("express"));
-const https_1 = __importDefault(require("https"));
-const fs_1 = __importDefault(require("fs"));
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const Machines_1 = require("./Machines");
 const path_1 = __importDefault(require("path"));
@@ -38,12 +36,12 @@ const ForcedStates_1 = require("./ForcedStates");
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const dotenv = __importStar(require("dotenv"));
 dotenv.config({ path: __dirname + '/../.env' });
-const key = fs_1.default.readFileSync(__dirname + '/../cert/selfsigned.key');
-const cert = fs_1.default.readFileSync(__dirname + '/../cert/selfsigned.crt');
-const options = {
-    key: key,
-    cert: cert
-};
+// const key = fs.readFileSync(__dirname + '/../cert/selfsigned.key');
+// const cert = fs.readFileSync(__dirname + '/../cert/selfsigned.crt');
+// const options = {
+//     key: key,
+//     cert: cert
+// };
 const app = (0, express_1.default)();
 const washers = new Machines_1.Machines('washer', 3, '/dev/ttyUSB1', 9600, ForcedStates_1.forcedWashers, ForcedStates_1.washersMapping);
 const dryers = new Machines_1.Machines('dryer', 4, '/dev/ttyUSB0', 9600, ForcedStates_1.forcedDryers, ForcedStates_1.dryersMapping);
@@ -63,6 +61,10 @@ app.use((request, response, next) => {
     // allow requests from web pages hosted anywhere
     response.set('Access-Control-Allow-Origin', '*');
     next();
+});
+app.get('/.well-known/acme-challenge/:filename', function (req, res) {
+    const { filename } = req.params;
+    res.sendFile(path_1.default.join(__dirname, '../.well-known/acme-challenge/' + filename));
 });
 app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../dist/LaundryElement.js'));
@@ -113,8 +115,7 @@ app.post('/notify', (request, response) => {
 app.get('/', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../public/index.html'));
 });
-const server = https_1.default.createServer(options, app);
-server.listen(443, () => {
+app.listen(80, () => {
     console.log("listening");
 });
 async function sendNotification(options) {

@@ -12,12 +12,12 @@ import { Person } from './Machines';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: __dirname+'/../.env' });
 
-const key = fs.readFileSync(__dirname + '/../cert/selfsigned.key');
-const cert = fs.readFileSync(__dirname + '/../cert/selfsigned.crt');
-const options = {
-    key: key,
-    cert: cert
-};
+// const key = fs.readFileSync(__dirname + '/../cert/selfsigned.key');
+// const cert = fs.readFileSync(__dirname + '/../cert/selfsigned.crt');
+// const options = {
+//     key: key,
+//     cert: cert
+// };
 
 const app = express();
 const washers = new Machines('washer', 3, '/dev/ttyUSB1', 9600, forcedWashers, washersMapping);
@@ -40,6 +40,11 @@ app.use((request, response, next) => {
     // allow requests from web pages hosted anywhere
     response.set('Access-Control-Allow-Origin', '*');
     next();
+});
+
+app.get('/.well-known/acme-challenge/:filename', function (req, res) {
+    const { filename } = req.params;
+    res.sendFile(path.join(__dirname, '../.well-known/acme-challenge/' + filename));
 });
 
 app.use('/dist/LaundryElement.js', (request, response) => {
@@ -97,9 +102,7 @@ app.get('/', (request, response) => {
 });
 
 
-const server = https.createServer(options, app);
-
-server.listen(443, () => {
+app.listen(80, () => {
     console.log("listening");
 });
 
