@@ -1,6 +1,7 @@
 import assert from 'assert';
 import express, { Application, request, response } from 'express';
 import https from 'https';
+import { Server } from 'http';
 import fs from 'fs';
 import HttpStatus from 'http-status-codes';
 import { Machines, MachineStatus } from './Machines';
@@ -11,13 +12,6 @@ import Mail from "nodemailer/lib/mailer";
 import { Person } from './Machines';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: __dirname+'/../.env' });
-
-// const key = fs.readFileSync(__dirname + '/../cert/selfsigned.key');
-// const cert = fs.readFileSync(__dirname + '/../cert/selfsigned.crt');
-// const options = {
-//     key: key,
-//     cert: cert
-// };
 
 const app = express();
 const washers = new Machines('washer', 3, '/dev/ttyUSB1', 9600, forcedWashers, washersMapping);
@@ -101,8 +95,15 @@ app.get('/', (request, response) => {
     response.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-
 app.listen(80, () => {
+    console.log('Listening...')
+})
+
+https.createServer({
+    key: fs.readFileSync(process.env["KEY"]!),
+    cert: fs.readFileSync(process.env["CERT"]!),
+    ca: fs.readFileSync(process.env["CA"]!)
+}, app). listen(443, () => {
     console.log("listening");
 });
 
