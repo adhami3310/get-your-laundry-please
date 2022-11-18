@@ -111,6 +111,9 @@ app.post('/notify', (request, response) => {
 app.get('/', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../public/index.html'));
 });
+app.get('/favicon.png', (request, response) => {
+    response.sendFile(path_1.default.join(__dirname, '../public/favicon.html'));
+});
 app.listen(80, () => {
     console.log('Listening...');
 });
