@@ -114,7 +114,7 @@ app.get('/', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../public/index.html'));
 });
 const server = https_1.default.createServer(options, app);
-server.listen(80, () => {
+server.listen(443, () => {
     console.log("listening");
 });
 async function sendNotification(options) {
