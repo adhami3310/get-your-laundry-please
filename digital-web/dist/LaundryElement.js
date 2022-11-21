@@ -247,6 +247,14 @@ const styles = `
     background: darkgrey;
 }
 
+.broken .since {
+    display: none;
+}
+
+.unknown .since {
+    display: none;
+}
+
 .tub {
     border: 0.8em solid var(--on-primary-dark);
     border-radius: 100%;
@@ -270,25 +278,24 @@ const styles = `
     font-size: 3em;
     display: flex;
     flex-direction: column;
+    line-height: 1em;
 }
 
 .since {
     font-size: 1.5em;
-    line-height: 1.5em;
+    line-height: 1em;
 }
 
 .text {
-    display: flex;
-    flex-direction: column;
     position: relative;
     top: -50%;
-    transform: translateY(calc(-50% + 1rem));
-    line-height: 3em;
+    transform: translateY(calc(-50% + 1.5em));
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     font-weight: bold;
+    gap: 0.5em;
 }
 
 .on .text {
