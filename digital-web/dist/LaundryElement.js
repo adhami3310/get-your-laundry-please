@@ -10,7 +10,7 @@ const styles = `
         'wght' 400,
         'GRAD' 0,
         'opsz' 48;
-    font-size: 2em;
+    font-size: 1.5em;
 }
 
 :host {
@@ -230,14 +230,12 @@ const styles = `
     }
 }
 
-.broken .text{
+.broken .material-symbols-outlined {
     color: white;
-    font-size: 0.8em;
 }
 
 .unknown .text{
     color: white;
-    font-size: 0.8em;
 }
 
 .broken .tub {
@@ -270,6 +268,8 @@ const styles = `
 
 #swatch {
     font-size: 3em;
+    display: flex;
+    flex-direction: column;
 }
 
 .since {
@@ -278,6 +278,8 @@ const styles = `
 }
 
 .text {
+    display: flex;
+    flex-direction: column;
     position: relative;
     top: -50%;
     transform: translateY(calc(-50% + 1rem));
