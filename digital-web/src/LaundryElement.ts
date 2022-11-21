@@ -232,17 +232,11 @@ const styles = `
 
 .broken .text{
     color: white;
-    top: -100%;
-    margin-top: 54%;
     font-size: 0.8em;
-    line-height: 3em;
 }
 
 .unknown .text{
     color: white;
-    top: -100%;
-    margin-top: 54%;
-    line-height: 3em;
     font-size: 0.8em;
 }
 
@@ -280,12 +274,13 @@ const styles = `
 
 .since {
     font-size: 1.5em;
+    line-height: 1.5em;
 }
 
 .text {
     position: relative;
-    top: -100%;
-    margin-top: 50%;
+    top: -50%;
+    transform: translateY(calc(-50% + 1rem));
     line-height: 3em;
     display: flex;
     flex-direction: column;
