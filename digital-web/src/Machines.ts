@@ -3,11 +3,11 @@ import { ReadlineParser } from '@serialport/parser-readline';
 import assert from 'assert';
 import { sendNotification } from '.';
 
-const HISTORY_TIME = 60000; //number of milliseconds to use to change data from ON to OFF
-const SHORT_TIME = 30000; //number of milliseconds to use to change data from OFF to ON
+const OFF_DURATION = 90000; //number of milliseconds to use to change data from ON to OFF
+const ON_DURATION = 20000; //number of milliseconds to use to change data from OFF to ON
 const LUDICROUS_CURRENT = 40; // above this the machine is acting weird and prob sth happened wrong
-const ON_THRESHOLD = 1; //the threshold to become ON
-const OFF_THRESHOLD = 0.7; //the threshold to become OFF
+const ON_THRESHOLD = 0.7; //the threshold to become ON
+const OFF_THRESHOLD = 0.5; //the threshold to become OFF
 
 export enum MachineStatus {
     ON, OFF, BROKEN, NOIDEA, NONE
@@ -110,41 +110,44 @@ export class Machines {
 
     private updateStatus(): void {
         const currentTime = Date.now();
-        this.history = this.history.filter(record => (currentTime - record.time <= HISTORY_TIME));
+        this.history = this.history.filter(record => (currentTime - record.time <= OFF_DURATION));
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i]!;
             if (currentStatus === MachineStatus.BROKEN || this.forcedStates[i] != MachineStatus.NONE) continue;
-            const historyValues = this.history
+            const longValues = this.history
                 .map(record => record.values[i])
                 .map(value => value !== undefined ? value : NaN)
                 .filter(value => !Number.isNaN(value) && value <= LUDICROUS_CURRENT);
             const shortValues = this.history
-                .filter(record => currentTime - record.time <= SHORT_TIME)
+                .filter(record => currentTime - record.time <= ON_DURATION)
                 .map(record => record.values[i])
                 .map(value => value !== undefined ? value : NaN)
                 .filter(value => !Number.isNaN(value) && value <= LUDICROUS_CURRENT);
-            if (historyValues.length == 0 || shortValues.length == 0) {
+            if (longValues.length == 0 || shortValues.length == 0) {
                 this.changeStatus(i, MachineStatus.NOIDEA);
                 continue;
             }
-            const historyAverage = historyValues.reduce((a, b) => a + b, 0) / historyValues.length;
+            const longAverage = longValues.reduce((a, b) => a + b, 0) / longValues.length;
             const shortAverage = shortValues.reduce((a, b) => a + b, 0) / shortValues.length;
             if (currentStatus === MachineStatus.NOIDEA) {
                 if (shortAverage >= ON_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.ON);
-                } else if (historyAverage <= OFF_THRESHOLD) {
+                    console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(longAverage * 100)}, ${Math.floor(shortValues[shortValues.length-1]! * 100)}, ${machineStatusToString(this.status[i]!)} => ON`);
+                } else if (longAverage <= OFF_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.OFF);
+                    console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(longAverage * 100)}, ${Math.floor(shortValues[shortValues.length-1]! * 100)}, ${machineStatusToString(this.status[i]!)} => OFF`);
                 }
             } else if (currentStatus === MachineStatus.OFF) {
                 if (shortAverage >= ON_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.ON);
+                    console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(longAverage * 100)}, ${Math.floor(shortValues[shortValues.length-1]! * 100)}, ${machineStatusToString(this.status[i]!)} => ON`);
                 }
             } else if (currentStatus === MachineStatus.ON) {
-                if (shortAverage <= OFF_THRESHOLD && historyAverage <= OFF_THRESHOLD) {
+                if (shortAverage <= OFF_THRESHOLD && longAverage <= OFF_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.OFF);
+                    console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(longAverage * 100)}, ${Math.floor(shortValues[shortValues.length-1]! * 100)}, ${machineStatusToString(this.status[i]!)} => OFF`);
                 }
             }
-            console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(historyAverage * 100)}, ${Math.floor(shortValues[shortValues.length-1]! * 100)}, ${machineStatusToString(this.status[i]!)}`);
         }
     }
 

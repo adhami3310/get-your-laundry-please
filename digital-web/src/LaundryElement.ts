@@ -38,6 +38,9 @@ const styles = `
 .laundry-machine {
     height: 15em;
     border-radius: 0.5em;
+    background: var(--secondary);
+    border: 2px solid var(--secondary);
+    overflow: hidden;
 }
 
 .unknown .laundry-body {
@@ -55,14 +58,12 @@ const styles = `
     --vibrate-distance: 0.1em;
 }
 
-:not(.active).on .laundry-body {
+.on .laundry-body {
     animation: bouncing infinite var(--vibrate-speed) linear;
 }
 
 .controls {
     background: var(--secondary);
-    border-top-left-radius: 0.5em;
-    border-top-right-radius: 0.5em;
     align-items: center;
     gap: 0.5em;
     height: 3em;
@@ -267,10 +268,6 @@ const styles = `
 
 .washing {
     background: var(--surface-light);
-    border: 2px solid var(--secondary);
-    border-top: none;
-    border-bottom-left-radius: 0.5em;
-    border-bottom-right-radius: 0.5em;
     height: 12em;
     display: flex;
     justify-content: center;
