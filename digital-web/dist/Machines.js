@@ -125,28 +125,28 @@ class Machines {
                 this.changeStatus(i, MachineStatus.NOIDEA);
                 continue;
             }
-            const longMax = longValues.reduce((a, b) => Math.max(a + b), 0) / longValues.length;
-            const shortMax = shortValues.reduce((a, b) => Math.max(a + b), 0) / shortValues.length;
+            const longMax = longValues.reduce((a, b) => Math.max(a, b), 0) / longValues.length;
+            const shortMax = shortValues.reduce((a, b) => Math.max(a, b), 0) / shortValues.length;
             if (currentStatus === MachineStatus.NOIDEA) {
                 if (shortMax >= ON_THRESHOLD) {
-                    this.changeStatus(i, MachineStatus.ON);
                     console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => ON`);
+                    this.changeStatus(i, MachineStatus.ON);
                 }
                 else if (longMax <= OFF_THRESHOLD) {
-                    this.changeStatus(i, MachineStatus.OFF);
                     console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => OFF`);
+                    this.changeStatus(i, MachineStatus.OFF);
                 }
             }
             else if (currentStatus === MachineStatus.OFF) {
                 if (shortMax >= ON_THRESHOLD) {
-                    this.changeStatus(i, MachineStatus.ON);
                     console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => ON`);
+                    this.changeStatus(i, MachineStatus.ON);
                 }
             }
             else if (currentStatus === MachineStatus.ON) {
                 if (shortMax <= OFF_THRESHOLD && longMax <= OFF_THRESHOLD) {
-                    this.changeStatus(i, MachineStatus.OFF);
                     console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => OFF`);
+                    this.changeStatus(i, MachineStatus.OFF);
                 }
             }
         }
