@@ -43,6 +43,16 @@ const styles = `
     overflow: hidden;
 }
 
+.broken.laundry-machine {
+    border-color: gray;
+    background: gray;
+}
+
+.unknown.laundry-machine {
+    border-color: gray;
+    background: gray;
+}
+
 .unknown .laundry-body {
     filter: grayscale(1);
 }
