@@ -7,8 +7,8 @@ const _1 = require(".");
 const OFF_DURATION = 90000; //number of milliseconds to use to change data from ON to OFF
 const ON_DURATION = 20000; //number of milliseconds to use to change data from OFF to ON
 const LUDICROUS_CURRENT = 40; // above this the machine is acting weird and prob sth happened wrong
-const ON_THRESHOLD = 0.7; //the threshold to become ON
-const OFF_THRESHOLD = 0.5; //the threshold to become OFF
+const ON_THRESHOLD = 0.9; //the threshold to become ON
+const OFF_THRESHOLD = 0.7; //the threshold to become OFF
 var MachineStatus;
 (function (MachineStatus) {
     MachineStatus[MachineStatus["ON"] = 0] = "ON";
@@ -26,6 +26,12 @@ function machineStatusToString(status) {
     if (status === MachineStatus.BROKEN)
         return "BROKEN";
     return "UNKNOWN";
+}
+function averageOfMax(values, count) {
+    const sortedValues = [...values].sort((a, b) => b - a);
+    const topValues = sortedValues.filter((elt, i) => i < count);
+    const topSum = topValues.reduce((a, b) => a + b, 0);
+    return topSum / count;
 }
 class Machines {
     name;
@@ -125,8 +131,8 @@ class Machines {
                 this.changeStatus(i, MachineStatus.NOIDEA);
                 continue;
             }
-            const longMax = longValues.reduce((a, b) => Math.max(a, b), 0);
-            const shortMax = shortValues.reduce((a, b) => Math.max(a, b), 0);
+            const longMax = averageOfMax(longValues, 3);
+            const shortMax = averageOfMax(shortValues, 2);
             if (currentStatus === MachineStatus.NOIDEA) {
                 if (shortMax >= ON_THRESHOLD) {
                     console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => ON`);
