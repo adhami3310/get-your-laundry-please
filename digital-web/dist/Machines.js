@@ -125,8 +125,8 @@ class Machines {
                 this.changeStatus(i, MachineStatus.NOIDEA);
                 continue;
             }
-            const longMax = longValues.reduce((a, b) => Math.max(a, b), 0) / longValues.length;
-            const shortMax = shortValues.reduce((a, b) => Math.max(a, b), 0) / shortValues.length;
+            const longMax = longValues.reduce((a, b) => Math.max(a, b), 0);
+            const shortMax = shortValues.reduce((a, b) => Math.max(a, b), 0);
             if (currentStatus === MachineStatus.NOIDEA) {
                 if (shortMax >= ON_THRESHOLD) {
                     console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => ON`);
