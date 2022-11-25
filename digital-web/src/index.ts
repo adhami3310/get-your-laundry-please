@@ -6,7 +6,7 @@ import fs from 'fs';
 import HttpStatus from 'http-status-codes';
 import { Machines, MachineStatus } from './Machines';
 import path from 'path';
-import { dryersMapping, forcedDryers, forcedWashers, washersMapping } from './ForcedStates';
+import { dryersMapping, forcedDryers, forcedWashers, washersMapping, dryersDelay, washersDelay } from './ForcedStates';
 import nodemailer from 'nodemailer';
 import Mail from "nodemailer/lib/mailer";
 import { Person } from './Machines';
@@ -14,8 +14,8 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: __dirname+'/../.env' });
 
 const app = express();
-const washers = new Machines('washer', 3, '/dev/ttyUSB1', 9600, forcedWashers, washersMapping);
-const dryers = new Machines('dryer', 4, '/dev/ttyUSB0', 9600, forcedDryers, dryersMapping);
+const washers = new Machines('washer', 3, '/dev/ttyUSB1', 9600, forcedWashers, washersMapping, washersDelay);
+const dryers = new Machines('dryer', 4, '/dev/ttyUSB0', 9600, forcedDryers, dryersMapping, dryersDelay);
 const transporter = nodemailer.createTransport({
     host: "outgoing.mit.edu",
     port: 465,

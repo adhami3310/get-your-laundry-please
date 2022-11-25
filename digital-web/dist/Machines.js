@@ -35,9 +35,10 @@ class Machines {
     history = [];
     lastTransition = [];
     forcedStates = [];
+    machineDelay = [];
     mapping;
     waiting = [];
-    constructor(name, count, path, br, forcedStates, mapping) {
+    constructor(name, count, path, br, forcedStates, mapping, machineDelay) {
         this.name = name;
         this.count = count;
         this.status = Array(count).fill(MachineStatus.NOIDEA);
@@ -48,6 +49,7 @@ class Machines {
             }
         });
         this.mapping = [...mapping];
+        this.machineDelay = [...machineDelay];
         this.serialPort = new serialport_1.SerialPort({ path: path, baudRate: br });
         let parser = this.serialPort.pipe(new parser_readline_1.ReadlineParser({ delimiter: '\n' }));
         this.serialPort.on("open", () => {
@@ -103,12 +105,14 @@ class Machines {
     }
     updateStatus() {
         const currentTime = Date.now();
-        this.history = this.history.filter(record => (currentTime - record.time <= OFF_DURATION));
+        const maxDelay = this.machineDelay.reduce((a, b) => Math.max(a, b), 0);
+        this.history = this.history.filter(record => (currentTime - record.time <= OFF_DURATION + maxDelay));
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i];
             if (currentStatus === MachineStatus.BROKEN || this.forcedStates[i] != MachineStatus.NONE)
                 continue;
             const longValues = this.history
+                .filter(record => currentTime - record.time <= OFF_DURATION + this.machineDelay[i])
                 .map(record => record.values[i])
                 .map(value => value !== undefined ? value : NaN)
                 .filter(value => !Number.isNaN(value) && value <= LUDICROUS_CURRENT);
@@ -121,28 +125,28 @@ class Machines {
                 this.changeStatus(i, MachineStatus.NOIDEA);
                 continue;
             }
-            const longAverage = longValues.reduce((a, b) => a + b, 0) / longValues.length;
-            const shortAverage = shortValues.reduce((a, b) => a + b, 0) / shortValues.length;
+            const longMax = longValues.reduce((a, b) => Math.max(a + b), 0) / longValues.length;
+            const shortMax = shortValues.reduce((a, b) => Math.max(a + b), 0) / shortValues.length;
             if (currentStatus === MachineStatus.NOIDEA) {
-                if (shortAverage >= ON_THRESHOLD) {
+                if (shortMax >= ON_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.ON);
-                    console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(longAverage * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => ON`);
+                    console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => ON`);
                 }
-                else if (longAverage <= OFF_THRESHOLD) {
+                else if (longMax <= OFF_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.OFF);
-                    console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(longAverage * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => OFF`);
+                    console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => OFF`);
                 }
             }
             else if (currentStatus === MachineStatus.OFF) {
-                if (shortAverage >= ON_THRESHOLD) {
+                if (shortMax >= ON_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.ON);
-                    console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(longAverage * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => ON`);
+                    console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => ON`);
                 }
             }
             else if (currentStatus === MachineStatus.ON) {
-                if (shortAverage <= OFF_THRESHOLD && longAverage <= OFF_THRESHOLD) {
+                if (shortMax <= OFF_THRESHOLD && longMax <= OFF_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.OFF);
-                    console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(longAverage * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => OFF`);
+                    console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1] * 100)}, ${machineStatusToString(this.status[i])} => OFF`);
                 }
             }
         }

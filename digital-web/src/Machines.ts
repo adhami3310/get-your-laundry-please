@@ -36,10 +36,19 @@ export class Machines {
     private history: Array<Record> = [];
     private readonly lastTransition: Array<number> = [];
     private readonly forcedStates: Array<MachineStatus> = [];
+    private readonly machineDelay: Array<number> = [];
     private readonly mapping: Array<number>;
     private waiting: Array<Person> = [];
 
-    public constructor(public readonly name: string, public readonly count: number, path: string, br: number, forcedStates: Array<MachineStatus>, mapping: Array<number>) {
+    public constructor(
+        public readonly name: string,
+        public readonly count: number,
+        path: string,
+        br: number,
+        forcedStates: Array<MachineStatus>,
+        mapping: Array<number>,
+        machineDelay: Array<number>
+    ) {
         this.status = Array(count).fill(MachineStatus.NOIDEA);
         this.lastTransition = Array(count).fill(Date.now());
         forcedStates.forEach((state, i) => {
@@ -48,6 +57,7 @@ export class Machines {
             }
         });
         this.mapping = [...mapping];
+        this.machineDelay = [...machineDelay];
         this.serialPort = new SerialPort({ path: path, baudRate: br });
         let parser = this.serialPort.pipe(new ReadlineParser({ delimiter: '\n' }));
         this.serialPort.on("open", () => {
@@ -110,11 +120,13 @@ export class Machines {
 
     private updateStatus(): void {
         const currentTime = Date.now();
-        this.history = this.history.filter(record => (currentTime - record.time <= OFF_DURATION));
+        const maxDelay = this.machineDelay.reduce((a, b) => Math.max(a, b), 0);
+        this.history = this.history.filter(record => (currentTime - record.time <= OFF_DURATION + maxDelay));
         for (let i = 0; i < this.status.length; i++) {
             const currentStatus = this.status[i]!;
             if (currentStatus === MachineStatus.BROKEN || this.forcedStates[i] != MachineStatus.NONE) continue;
             const longValues = this.history
+                .filter(record => currentTime - record.time <= OFF_DURATION + this.machineDelay[i]!)
                 .map(record => record.values[i])
                 .map(value => value !== undefined ? value : NaN)
                 .filter(value => !Number.isNaN(value) && value <= LUDICROUS_CURRENT);
@@ -127,25 +139,25 @@ export class Machines {
                 this.changeStatus(i, MachineStatus.NOIDEA);
                 continue;
             }
-            const longAverage = longValues.reduce((a, b) => a + b, 0) / longValues.length;
-            const shortAverage = shortValues.reduce((a, b) => a + b, 0) / shortValues.length;
+            const longMax = longValues.reduce((a, b) => Math.max(a + b), 0) / longValues.length;
+            const shortMax = shortValues.reduce((a, b) => Math.max(a + b), 0) / shortValues.length;
             if (currentStatus === MachineStatus.NOIDEA) {
-                if (shortAverage >= ON_THRESHOLD) {
+                if (shortMax >= ON_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.ON);
-                    console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(longAverage * 100)}, ${Math.floor(shortValues[shortValues.length-1]! * 100)}, ${machineStatusToString(this.status[i]!)} => ON`);
-                } else if (longAverage <= OFF_THRESHOLD) {
+                    console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1]! * 100)}, ${machineStatusToString(this.status[i]!)} => ON`);
+                } else if (longMax <= OFF_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.OFF);
-                    console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(longAverage * 100)}, ${Math.floor(shortValues[shortValues.length-1]! * 100)}, ${machineStatusToString(this.status[i]!)} => OFF`);
+                    console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1]! * 100)}, ${machineStatusToString(this.status[i]!)} => OFF`);
                 }
             } else if (currentStatus === MachineStatus.OFF) {
-                if (shortAverage >= ON_THRESHOLD) {
+                if (shortMax >= ON_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.ON);
-                    console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(longAverage * 100)}, ${Math.floor(shortValues[shortValues.length-1]! * 100)}, ${machineStatusToString(this.status[i]!)} => ON`);
+                    console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1]! * 100)}, ${machineStatusToString(this.status[i]!)} => ON`);
                 }
             } else if (currentStatus === MachineStatus.ON) {
-                if (shortAverage <= OFF_THRESHOLD && longAverage <= OFF_THRESHOLD) {
+                if (shortMax <= OFF_THRESHOLD && longMax <= OFF_THRESHOLD) {
                     this.changeStatus(i, MachineStatus.OFF);
-                    console.log(`${this.name}[${i}]: ${Math.floor(shortAverage * 100)}, ${Math.floor(longAverage * 100)}, ${Math.floor(shortValues[shortValues.length-1]! * 100)}, ${machineStatusToString(this.status[i]!)} => OFF`);
+                    console.log(`${this.name}[${i}]: ${Math.floor(shortMax * 100)}, ${Math.floor(longMax * 100)}, ${Math.floor(shortValues[shortValues.length - 1]! * 100)}, ${machineStatusToString(this.status[i]!)} => OFF`);
                 }
             }
         }
@@ -162,7 +174,7 @@ export class Machines {
             const people = this.waiting.filter(person => person.machines.find((x) => x === outsideIndex) != undefined);
             this.waiting = this.waiting.filter(person => person.machines.find((x) => x === outsideIndex) === undefined);
             people.forEach(person => {
-                sendNotification({ to: person.email, subject: `${this.name} #${outsideIndex+1} is ready eom` });
+                sendNotification({ to: person.email, subject: `${this.name} #${outsideIndex + 1} is ready eom` });
             });
         }
         this.status[index] = newStatus;
