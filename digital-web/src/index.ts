@@ -94,6 +94,18 @@ app.post('/notify', (request, response) => {
 app.get('/favicon.png', (request, response) => {
     response.sendFile(path.join(__dirname, '../public/favicon.png'));
 });
+app.get('/heart_broken.svg', (request, response) => {
+    response.sendFile(path.join(__dirname, '../public/heart_broken.svg'));
+});
+app.get('/mail.svg', (request, response) => {
+    response.sendFile(path.join(__dirname, '../public/mail.svg'));
+});
+app.get('/check.svg', (request, response) => {
+    response.sendFile(path.join(__dirname, '../public/check.svg'));
+});
+app.get('/question.svg', (request, response) => {
+    response.sendFile(path.join(__dirname, '../public/question.svg'));
+});
 
 app.get('/', (request, response) => {
     response.sendFile(path.join(__dirname, '../public/index.html'));
