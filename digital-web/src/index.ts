@@ -103,13 +103,15 @@ app.listen(80, () => {
     console.log('Listening...')
 })
 
-https.createServer({
-    key: fs.readFileSync(process.env["KEY"]!),
-    cert: fs.readFileSync(process.env["CERT"]!),
-    ca: fs.readFileSync(process.env["CA"]!)
-}, app). listen(443, () => {
-    console.log("listening");
-});
+if (process.env["KEY"] !== undefined) {
+    https.createServer({
+        key: fs.readFileSync(process.env["KEY"]!),
+        cert: fs.readFileSync(process.env["CERT"]!),
+        ca: fs.readFileSync(process.env["CA"]!)
+    }, app). listen(443, () => {
+        console.log("listening");
+    });
+}
 
 
 export async function sendNotification(options: { to: string, subject: string }): Promise<void> {

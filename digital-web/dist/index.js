@@ -117,13 +117,15 @@ app.get('/', (request, response) => {
 app.listen(80, () => {
     console.log('Listening...');
 });
-https_1.default.createServer({
-    key: fs_1.default.readFileSync(process.env["KEY"]),
-    cert: fs_1.default.readFileSync(process.env["CERT"]),
-    ca: fs_1.default.readFileSync(process.env["CA"])
-}, app).listen(443, () => {
-    console.log("listening");
-});
+if (process.env["KEY"] !== undefined) {
+    https_1.default.createServer({
+        key: fs_1.default.readFileSync(process.env["KEY"]),
+        cert: fs_1.default.readFileSync(process.env["CERT"]),
+        ca: fs_1.default.readFileSync(process.env["CA"])
+    }, app).listen(443, () => {
+        console.log("listening");
+    });
+}
 async function sendNotification(options) {
     console.log(`sending email to ${options.to}, with content "${options.subject}"`);
     transporter.sendMail({

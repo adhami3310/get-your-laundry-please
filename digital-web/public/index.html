@@ -7,26 +7,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="favicon.png">
     <script src="../dist/LaundryElement.js"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <title>Laundry Server</title>
-    <style>
-        .material-symbols-outlined {
-          font-variation-settings:
-          'FILL' 0,
-          'wght' 400,
-          'GRAD' 0,
-          'opsz' 48;
-          padding: 0 4px;
-          height: 1em;
-          font-size: 1.5em;
-        }
-    </style>
+    <link rel="preload" as="image" href="check.svg">
+    <link rel="preload" as="image" href="heart_broken.svg">
+    <link rel="preload" as="image" href="mail.svg">
+    <link rel="preload" as="image" href="question.svg">
+    <link rel="preload" as="image" href="ozok.svg">
+
     <style>
 
+        .symbol {
+            min-width: var(--symbol-size);
+            min-height: var(--symbol-size);
+        }
+
+        .mail {
+            background: url('./mail.svg');
+            min-width: calc(1.25 * var(--symbol-size));
+            min-height: calc(1.25 * var(--symbol-size));
+            background-size: calc(1.25 * var(--symbol-size)) calc(1.25 * var(--symbol-size));
+        }
+
+        .notif-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .notif-icon svg {
+            max-width: var(--symbol-size);
+            max-height: var(--symbol-size);
+        }
+
+        .check {
+            background: url('./check.svg');
+            background-size: var(--symbol-size) var(--symbol-size);
+        }
 
         body {
+            --symbol-size: 24px;
             font-family: sans-serif;
-            font-size: 2.44vh;
+            font-size: 22px;
             margin: 0.4em 0.2em;
             --background-light: #FFFBFE;
             --background-dark: #1C1B1F;
@@ -79,9 +100,11 @@
             --svg-color: var(--on-surface);
         }
 
-
-
         @media (prefers-color-scheme: dark) {
+            .mail, .check {
+                filter: invert(100%);
+            }
+
             body {
                 --inverse-surface: var(--inverse-surface-dark);
                 --on-inverse-surface: var(--on-inverse-surface-dark);
@@ -98,12 +121,6 @@
                 --on-background: var(--on-background-dark);
                 --surface: var(--surface-dark);
                 --on-surface: var(--on-surface-dark);
-            }
-        }
-
-        @media only screen and (max-width: 100vh) {
-            body {
-                font-size: 3.7vw;
             }
         }
 
@@ -138,7 +155,7 @@
         #text {
             margin-bottom: auto;
             grid-area: text;
-            font-size: 0.8em;
+            font-size: 18px;
             padding: 0em 0.5em;
         }
         
@@ -197,28 +214,28 @@
             flex: 1;
             font-family: inherit;
             appearance: none;
-            border: 1px solid var(--on-surface-variant);
+            border: 1px solid var(--outline);
             background: var(--surface);
             color: var(--on-surface);
-            border-radius: 4px;
-            padding: 0.2em;
-            font-size: 1.15em;
+            border-radius: 100em;
+            padding: 5px 15px;
+            font-size: inherit;
         }
         
         input[type=email]::placeholder {
             color: var(--on-surface-variant);
         }
-
+        
         input[type=email]:active,input[type=email]:focus {
             outline: none;
             border: 1px solid var(--primary);
-            border-radius: 4px;
+            border-radius: 100em;
         }
 
         .sigment-container {
             justify-content: space-evenly;
             display: flex;
-            margin: 0.5em 0;
+            margin: 8px 0;
         }
         
         .sigment:not(.active) {
@@ -231,7 +248,7 @@
             background: var(--surface);
             font-family: inherit;
             color: var(--on-surface);
-            padding: 0.3em 1em;
+            padding: 5px 15px;
             font-size: inherit;
             border: 1px solid var(--outline);
             width: 100%;
@@ -297,6 +314,7 @@
 
         .email {
             display: flex;
+            gap: 0.6em;
             align-items: center;
         }
 
@@ -407,6 +425,16 @@
             width: 100%;
         }
 
+        @media only screen and (max-width: 100vh) {
+            body {
+                font-size: 3.7vw;
+                --symbol-size: 4vw;
+            }
+
+            #text {
+                font-size: 3vw;
+            }
+        }
         </style>
     <script>
         function ask(email, machines) {
@@ -504,19 +532,19 @@
                 <legend>Notifications</legend>
                 <form  name="notifications">
                     <div class="email">
-                        <span class="material-symbols-outlined check">mail</span>
-                        <input name="email" type="email" placeholder="Email" required/>
+                        <span class="symbol mail"></span>
+                        <input name="email" type="email" placeholder="jarthur@mit.edu" required/>
                     </div>
                     <div class="selection sigment-container">
-                        <button type="button" class="sigment selected" id="selected"><span class="material-symbols-outlined check">check</span><span class="option">Selected</span></button>
-                        <button type="button" class="sigment active selected" id="washers"><span class="material-symbols-outlined check">check</span><span class="option">Washers</span></button>
-                        <button type="button" class="sigment selected" id="dryers"><span class="material-symbols-outlined check">check</span><span class="option">Dryers</span></button>
+                        <button type="button" class="sigment selected" id="selected"><span class="symbol check"></span><span class="option">Selected</span></button>
+                        <button type="button" class="sigment active selected" id="washers"><span class="symbol check"></span><span class="option">Washers</span></button>
+                        <button type="button" class="sigment selected" id="dryers"><span class="symbol check"></span><span class="option">Dryers</span></button>
                     </div>
                     <div class="types sigment-container">
-                        <button type="button" class="sigment active type" id="first"><span class="material-symbols-outlined check">check</span><span class="option">First</span></button>
-                        <button type="button" class="sigment type" id="ind"><span class="material-symbols-outlined check">check</span><span class="option">Each</span></button>
+                        <button type="button" class="sigment active type" id="first"><span class="symbol check"></span><span class="option">First</span></button>
+                        <button type="button" class="sigment type" id="ind"><span class="symbol check"></span><span class="option">Each</span></button>
                     </div>
-                    <button id="send_notify" class="main" type="submit"><span class="material-symbols-outlined">notifications</span>Notify</button>
+                    <button id="send_notify" class="main" type="submit"><span class="notif-icon"><svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 96 960 960" width="40" style="fill: var(--on-primary);"><path d="M193.333 856Q179 856 169.5 846.5q-9.5-9.5-9.5-23.833 0-14.333 9.5-23.833 9.5-9.5 23.833-9.5h49.334V492q0-82.333 49.666-148.167Q342 278 422.667 260v-28.667q0-23.666 16.833-39.5Q456.333 176 480 176t40.5 15.833q16.833 15.834 16.833 39.5V260Q618 278 668 343.833 718 409.667 718 492v297.334h48.667q14.333 0 23.833 9.5 9.5 9.5 9.5 23.833 0 14.333-9.5 23.833-9.5 9.5-23.833 9.5H193.333ZM480 976q-32.333 0-56.167-23.5Q400 929 400 896h160q0 33-23.5 56.5T480 976Z"/></svg></span>Notify</button>
                 </form>
             </fieldset>
             <h2>Random Hall's Laundry Server</h2>

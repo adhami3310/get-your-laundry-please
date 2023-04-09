@@ -2,18 +2,23 @@
 const states = new Set(["OFF", "ON", "UNKNOWN", "BROKEN"]);
 const subStates = new Set(["ON", "UNKNOWN", "BROKEN", "OFF"]);
 const styles = `
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
+.symbol {
+    min-width: var(--symbol-size);
+    min-height: var(--symbol-size);
+}
 
-.material-symbols-outlined {
-    font-variation-settings:
-        'FILL' 1,
-        'wght' 400,
-        'GRAD' 0,
-        'opsz' 48;
-    font-size: 1.5em;
+.question_mark {
+    background: url('./question.svg');
+    background-size: var(--symbol-size) var(--symbol-size);
+}
+
+.heart_broken {
+    background: url('./heart_broken.svg');
+    background-size: var(--symbol-size) var(--symbol-size);
 }
 
 :host {
+    --symbol-size: 1.5em;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     display: inline-block;
     color: white;
@@ -444,11 +449,11 @@ class LaundryElement extends HTMLElement {
                 since.innerHTML = `for ${LaundryElement.timeDisplay(LaundryElement.getSince(this.lastTransition))}`;
             }
             else if (this.state === "UNKNOWN") {
-                swatch.innerHTML = `<span class="material-symbols-outlined">question_mark</span>`;
+                swatch.innerHTML = `<span class="symbol question_mark"></span>`;
                 since.innerHTML = "";
             }
             else {
-                swatch.innerHTML = `<span class="material-symbols-outlined">heart_broken</span>`;
+                swatch.innerHTML = `<span class="symbol heart_broken"></span>`;
                 since.innerHTML = "";
             }
         }
