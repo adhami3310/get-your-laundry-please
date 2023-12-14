@@ -1,8 +1,6 @@
 import { SerialPort } from 'serialport';
 import { ReadlineParser } from '@serialport/parser-readline';
-import assert from 'assert';
 import { sendNotification } from '.';
-import { lstat } from 'fs';
 
 const OFF_DURATION = 90000; //number of milliseconds to use to change data from ON to OFF
 const ON_DURATION = 20000; //number of milliseconds to use to change data from OFF to ON

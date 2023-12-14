@@ -27,7 +27,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendNotification = void 0;
-const assert_1 = __importDefault(require("assert"));
 const express_1 = __importDefault(require("express"));
 const https_1 = __importDefault(require("https"));
 const fs_1 = __importDefault(require("fs"));
@@ -58,10 +57,6 @@ app.use((request, response, next) => {
     response.set('Access-Control-Allow-Origin', '*');
     next();
 });
-app.get('/.well-known/acme-challenge/:filename', function (req, res) {
-    const { filename } = req.params;
-    res.sendFile(path_1.default.join(__dirname, '../.well-known/acme-challenge/' + filename));
-});
 app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path_1.default.join(__dirname, '../dist/LaundryElement.js'));
 });
@@ -75,9 +70,6 @@ app.use('/watch', (request, response) => {
 app.post('/notify', (request, response) => {
     const { email, machines } = request.body;
     const machinesArray = Array.from(machines);
-    console.log(machinesArray);
-    (0, assert_1.default)(email !== undefined);
-    console.log(email);
     machinesArray.forEach(req => {
         const { machine, index } = req;
         if (machine !== "washer" && machine !== "dryer") {

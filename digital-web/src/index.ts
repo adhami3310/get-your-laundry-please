@@ -1,15 +1,11 @@
-import assert from 'assert';
-import express, { Application, request, response } from 'express';
+import express from 'express';
 import https from 'https';
-import { Server } from 'http';
 import fs from 'fs';
 import HttpStatus from 'http-status-codes';
 import { Machines, MachineStatus } from './Machines';
 import path from 'path';
 import { dryersMapping, forcedDryers, forcedWashers, washersMapping, dryersDelay, washersDelay } from './ForcedStates';
 import nodemailer from 'nodemailer';
-import Mail from "nodemailer/lib/mailer";
-import { Person } from './Machines';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: __dirname+'/../.env' });
 
@@ -36,11 +32,6 @@ app.use((request, response, next) => {
     next();
 });
 
-app.get('/.well-known/acme-challenge/:filename', function (req, res) {
-    const { filename } = req.params;
-    res.sendFile(path.join(__dirname, '../.well-known/acme-challenge/' + filename));
-});
-
 app.use('/dist/LaundryElement.js', (request, response) => {
     response.sendFile(path.join(__dirname, '../dist/LaundryElement.js'));
 });
@@ -57,9 +48,6 @@ app.use('/watch', (request, response) => {
 app.post('/notify', (request, response) => {
     const { email, machines } = request.body;
     const machinesArray: Array<{machine: string, index: number}> = Array.from(machines);
-    console.log(machinesArray);
-    assert(email !== undefined );
-    console.log(email);
 
     machinesArray.forEach(req => {
         const {machine, index} = req;
